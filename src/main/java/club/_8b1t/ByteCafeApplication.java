@@ -1,4 +1,4 @@
-package club._8b1t.bytecafe;
+package club._8b1t;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
