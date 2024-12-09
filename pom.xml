@@ -38,7 +38,7 @@
         <!-- =========================== -->
         <!--           后添加             -->
         <!-- =========================== -->
-        
+
     </properties>
     <dependencies>
         <dependency>
@@ -66,6 +66,11 @@
             <groupId>io.github.linpeilie</groupId>
             <artifactId>mapstruct-plus-spring-boot-starter</artifactId>
             <version>${mapstruct-plus.version}</version>
+        </dependency>
+        <!-- Spring AOP -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-aop</artifactId>
         </dependency>
 
         <!-- =========================== -->
