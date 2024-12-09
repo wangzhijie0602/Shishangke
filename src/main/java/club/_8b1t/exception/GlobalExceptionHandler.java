@@ -10,8 +10,6 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
  * 全局异常处理类
  *
  * @author 8bit
- * @version 1.0
- * @since 1.0
  */
 @RestControllerAdvice
 @Slf4j

@@ -12,8 +12,6 @@ import org.springframework.stereotype.Component;
  * aop实现日志的输出
  *
  * @author 8bit
- * @version 1.0
- * @since 1.0
  */
 @Slf4j
 @Aspect

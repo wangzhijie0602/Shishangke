@@ -6,8 +6,6 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
  * 用户密码加密工具类
  *
  * @author 8bit
- * @version 1.0
- * @since 1.0
  */
 public class PasswordEncoderUtil {
 
