@@ -6,10 +6,10 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
 @MapperScan("club._8b1t.mapper")
-public class ByteCafeApplication {
+public class ShishangkeApplication {
 
     public static void main(String[] args) {
-        SpringApplication.run(ByteCafeApplication.class, args);
+        SpringApplication.run(ShishangkeApplication.class, args);
     }
 
 }

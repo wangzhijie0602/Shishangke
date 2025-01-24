@@ -4,12 +4,12 @@ server:
 
 spring:
   application:
-    name: ByteCafe
+    name: Shishangke
 
   datasource:
-    url: jdbc:mysql://ubuntu-server:3306/bytecafe
-    username: bytecafe
-    password: bytecafe
+    url: jdbc:mysql://ubuntu-server:3306/Shishangke
+    username: Shishangke
+    password: Shishangke
     driver-class-name: com.mysql.cj.jdbc.Driver
 
 mybatis-plus:

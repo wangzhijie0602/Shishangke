@@ -9,10 +9,10 @@
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
     <groupId>club._8b1t</groupId>
-    <artifactId>ByteCafe</artifactId>
+    <artifactId>Shishangke</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <name>ByteCafe</name>
-    <description>ByteCafe</description>
+    <name>Shishangke</name>
+    <description>Shishangke</description>
     <url/>
     <licenses>
         <license/>
