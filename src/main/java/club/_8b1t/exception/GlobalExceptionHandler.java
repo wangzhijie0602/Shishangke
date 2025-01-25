@@ -1,6 +1,6 @@
 package club._8b1t.exception;
 
-import club._8b1t.model.response.BaseResult;
+import club._8b1t.model.dto.response.BaseResult;
 import club._8b1t.util.ResultUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.ExceptionHandler;

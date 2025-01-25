@@ -40,11 +40,6 @@ CREATE TABLE user
   COLLATE = utf8mb4_0900_ai_ci
     COMMENT ='用户主表（业务层维护外键约束）';
 
--- 索引优化
-CREATE INDEX idx_user_email ON user (email);
-CREATE INDEX idx_user_created ON user (created_at);
-CREATE INDEX idx_user_deleted ON user (deleted_at);
-
 -- ----------------------------
 -- 2. 角色表 (role)
 -- ----------------------------
@@ -72,17 +67,16 @@ VALUES ('USER', '普通用户', true),
 -- ----------------------------
 CREATE TABLE user_role
 (
+    id          BIGINT AUTO_INCREMENT COMMENT '自增主键ID',
     user_id     BIGINT       NOT NULL COMMENT '用户ID',
     role_id     INT UNSIGNED NOT NULL COMMENT '角色ID',
     assigned_by BIGINT COMMENT '分配人ID',
     assigned_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP COMMENT '分配时间',
-    PRIMARY KEY (user_id, role_id),
+    PRIMARY KEY (id),
+    UNIQUE KEY uk_user_role (user_id, role_id) COMMENT '用户与角色的唯一组合约束',
     INDEX idx_user_role_user (user_id) COMMENT '用户维度查询优化',
     INDEX idx_user_role_role (role_id) COMMENT '角色维度查询优化'
 ) ENGINE = InnoDB
   DEFAULT CHARSET = utf8mb4
   COLLATE = utf8mb4_0900_ai_ci
-    COMMENT ='用户-角色关系表（业务层维护关联）';
-
--- 复合索引优化
-CREATE INDEX idx_user_role_combo ON user_role (user_id, role_id);
+    COMMENT = '用户-角色关系表（业务层维护关联）';

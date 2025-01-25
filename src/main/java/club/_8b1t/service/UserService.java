@@ -10,4 +10,9 @@ import com.baomidou.mybatisplus.extension.service.IService;
 */
 public interface UserService extends IService<User> {
 
+    /**
+     * 根据用户名查找用户记录
+     * */
+    User findByUsername(String username);
+
 }

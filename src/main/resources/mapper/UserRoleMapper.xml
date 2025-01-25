@@ -5,14 +5,15 @@
 <mapper namespace="club._8b1t.mapper.UserRoleMapper">
 
     <resultMap id="BaseResultMap" type="club._8b1t.model.domain.UserRole">
-            <id property="userId" column="user_id" jdbcType="BIGINT"/>
-            <id property="roleId" column="role_id" jdbcType="INTEGER"/>
+            <id property="id" column="id" jdbcType="BIGINT"/>
+            <result property="userId" column="user_id" jdbcType="BIGINT"/>
+            <result property="roleId" column="role_id" jdbcType="INTEGER"/>
             <result property="assignedBy" column="assigned_by" jdbcType="BIGINT"/>
             <result property="assignedAt" column="assigned_at" jdbcType="TIMESTAMP"/>
     </resultMap>
 
     <sql id="Base_Column_List">
-        user_id,role_id,assigned_by,
-        assigned_at
+        id,user_id,role_id,
+        assigned_by,assigned_at
     </sql>
 </mapper>

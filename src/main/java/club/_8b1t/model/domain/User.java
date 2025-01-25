@@ -1,6 +1,7 @@
 package club._8b1t.model.domain;
 
 import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.TableLogic;
 import com.baomidou.mybatisplus.annotation.TableName;
 import java.util.Date;
 import lombok.Data;
@@ -96,6 +97,7 @@ public class User {
     /**
      * 软删除时间戳
      */
+    @TableLogic
     private Date deletedAt;
 
     /**

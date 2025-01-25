@@ -1,6 +1,6 @@
 package club._8b1t.util;
 
-import club._8b1t.model.response.BaseResult;
+import club._8b1t.model.dto.response.BaseResult;
 
 /**
  * 统一返回类型
@@ -9,9 +9,15 @@ import club._8b1t.model.response.BaseResult;
  */
 public class ResultUtil {
 
-    public static BaseResult success() { return new BaseResult(1, "success", null); }
+    public static <T> BaseResult<T> success() {
+        return new BaseResult<>(1, "success", null);
+    }
 
-    public static BaseResult success(Object data) { return new BaseResult(1, "success", data); }
+    public static <T> BaseResult<T> success(T data) {
+        return new BaseResult<>(1, "success", data);
+    }
 
-    public static BaseResult error(String msg) { return new BaseResult(0, msg, null); }
+    public static <T> BaseResult<T> error(String msg) {
+        return new BaseResult<>(0, msg, null);
+    }
 }
