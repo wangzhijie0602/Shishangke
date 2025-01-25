@@ -1,4 +1,4 @@
-package club._8b1t.utils;
+package club._8b1t.util;
 
 import club._8b1t.model.response.BaseResult;
 
