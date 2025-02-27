@@ -1,4 +1,4 @@
-package club._8b1t.aspect;
+package club._8b1t.aop;
 
 import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.JoinPoint;

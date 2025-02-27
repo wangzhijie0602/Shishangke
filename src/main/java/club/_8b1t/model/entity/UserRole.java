@@ -1,22 +1,24 @@
-package club._8b1t.model.domain;
+package club._8b1t.model.entity;
 
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
-import java.util.Date;
 import lombok.Data;
 
+import java.util.Date;
+
 /**
- * 用户-角色关系表（业务层维护关联）
+ * 用户-角色关系表
+ *
  * @TableName user_role
  */
-@TableName(value ="user_role")
+@TableName(value = "user_role")
 @Data
 public class UserRole {
     /**
-     * 自增主键ID
+     * 主键ID
      */
-    @TableId(type = IdType.AUTO)
+    @TableId(type = IdType.ASSIGN_ID)
     private Long id;
 
     /**
