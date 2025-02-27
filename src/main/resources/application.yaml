@@ -7,7 +7,7 @@ spring:
     name: Shishangke
 
   datasource:
-    url: jdbc:mysql://localhost:3306/Shishangke
+    url: jdbc:mysql://rainyun:3307/Shishangke
     username: root
     password: Shishangke
     driver-class-name: com.mysql.cj.jdbc.Driver
@@ -19,7 +19,7 @@ mybatis-plus:
       logic-delete-value: now() # 逻辑已删除值
       logic-not-delete-value: 'NULL' # 逻辑未删除值
   configuration:
-    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+    log-impl: org.apache.ibatis.logging.slf4j.Slf4jImpl
 
 ############## Sa-Token 配置 (文档: https://sa-token.cc) ##############
 sa-token:
