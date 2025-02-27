@@ -69,5 +69,5 @@ public class User {
     /**
      * 软删除
      */
-    private Integer isDelete;
+    private Integer isDeleted;
 }

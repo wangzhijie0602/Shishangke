@@ -1,7 +1,6 @@
 package club._8b1t.exception;
 
-import club._8b1t.model.dto.response.BaseResult;
-import club._8b1t.util.ResultUtil;
+import cn.dev33.satoken.util.SaResult;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -22,8 +21,8 @@ public class GlobalExceptionHandler {
      * @return 包含异常信息的 JSON 响应
      */
     @ExceptionHandler(Exception.class)
-    public BaseResult handleException(Exception e) {
+    public SaResult handleException(Exception e) {
         log.error(e.getMessage(), e);
-        return ResultUtil.error(e.getMessage());
+        return SaResult.error(e.getMessage());
     }
 }

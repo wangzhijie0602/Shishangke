@@ -5,13 +5,13 @@
 <mapper namespace="club._8b1t.mapper.PermissionMapper">
 
     <resultMap id="BaseResultMap" type="club._8b1t.model.entity.Permission">
-            <id property="id" column="id" jdbcType="INTEGER"/>
-            <result property="permissionCode" column="permission_code" jdbcType="VARCHAR"/>
-            <result property="permissionName" column="permission_name" jdbcType="VARCHAR"/>
-            <result property="parentId" column="parent_id" jdbcType="INTEGER"/>
-            <result property="isSystem" column="is_system" jdbcType="TINYINT"/>
-            <result property="createdAt" column="created_at" jdbcType="TIMESTAMP"/>
-            <result property="updatedAt" column="updated_at" jdbcType="TIMESTAMP"/>
+        <id property="id" column="id" jdbcType="INTEGER"/>
+        <result property="permissionCode" column="permission_code" jdbcType="VARCHAR"/>
+        <result property="permissionName" column="permission_name" jdbcType="VARCHAR"/>
+        <result property="parentId" column="parent_id" jdbcType="INTEGER"/>
+        <result property="isSystem" column="is_system" jdbcType="TINYINT"/>
+        <result property="createdAt" column="created_at" jdbcType="TIMESTAMP"/>
+        <result property="updatedAt" column="updated_at" jdbcType="TIMESTAMP"/>
     </resultMap>
 
     <sql id="Base_Column_List">

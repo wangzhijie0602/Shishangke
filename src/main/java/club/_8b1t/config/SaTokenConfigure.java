@@ -1,4 +1,4 @@
-package com.bit.config;
+package club._8b1t.config;
 
 import cn.dev33.satoken.interceptor.SaInterceptor;
 import cn.dev33.satoken.router.SaHttpMethod;

@@ -1,7 +1,5 @@
 server:
-  # 端口
   port: 8081
-
 spring:
   application:
     name: Shishangke
@@ -15,9 +13,9 @@ spring:
 mybatis-plus:
   global-config:
     db-config:
-      logic-delete-field: deletedAt # 全局逻辑删除字段名
-      logic-delete-value: now() # 逻辑已删除值
-      logic-not-delete-value: 'NULL' # 逻辑未删除值
+      logic-delete-field: is_deleted # 全局逻辑删除字段名
+      logic-delete-value: 1 # 逻辑已删除值
+      logic-not-delete-value: 0 # 逻辑未删除值
   configuration:
     log-impl: org.apache.ibatis.logging.slf4j.Slf4jImpl
 

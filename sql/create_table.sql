@@ -16,7 +16,7 @@ CREATE TABLE user
     last_login_time TIMESTAMP COMMENT '最后登录时间',
     created_at      TIMESTAMP                    DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
     updated_at      TIMESTAMP                    DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
-    is_delete       BOOLEAN                      DEFAULT 0 COMMENT '软删除'
+    is_deleted      BOOLEAN                      DEFAULT 0 COMMENT '软删除'
 ) ENGINE = InnoDB
   DEFAULT CHARSET = utf8mb4
   COLLATE = utf8mb4_0900_ai_ci
