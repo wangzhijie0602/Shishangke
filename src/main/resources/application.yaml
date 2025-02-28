@@ -17,7 +17,7 @@ mybatis-plus:
       logic-delete-value: 1 # 逻辑已删除值
       logic-not-delete-value: 0 # 逻辑未删除值
   configuration:
-    log-impl: org.apache.ibatis.logging.slf4j.Slf4jImpl
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
 
 ############## Sa-Token 配置 (文档: https://sa-token.cc) ##############
 sa-token:

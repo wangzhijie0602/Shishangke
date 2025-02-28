@@ -1,8 +1,10 @@
 package club._8b1t.model.entity;
 
+import club._8b1t.model.vo.UserVO;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
+import io.github.linpeilie.annotations.AutoMapper;
 import lombok.Data;
 
 import java.util.Date;
@@ -12,6 +14,7 @@ import java.util.Date;
  *
  * @TableName user
  */
+@AutoMapper(target = UserVO.class)
 @TableName(value = "user")
 @Data
 public class User {
@@ -30,6 +33,11 @@ public class User {
      * 用户昵称
      */
     private String nickname;
+
+    /**
+     * 头像URL
+     */
+    private String avatar;
 
     /**
      * 电子邮箱

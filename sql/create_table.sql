@@ -9,6 +9,7 @@ CREATE TABLE user
     id              BIGINT PRIMARY KEY COMMENT '主键ID',
     username        VARCHAR(255) UNIQUE NOT NULL COMMENT '唯一用户名',
     nickname        VARCHAR(255) COMMENT '用户昵称',
+    avatar          VARCHAR(255)                 DEFAULT 'https://i-blog.csdnimg.cn/blog_migrate/a4fa5161369727154bc3a7d1c52bb9c0.png' COMMENT '头像URL',
     email           VARCHAR(255) UNIQUE COMMENT '电子邮箱',
     phone           VARCHAR(50) UNIQUE COMMENT '电话号码',
     password        VARCHAR(255)        NOT NULL COMMENT '密码',
