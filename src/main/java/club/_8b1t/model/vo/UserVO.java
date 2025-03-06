@@ -11,7 +11,8 @@ public class UserVO {
     private String avatar;
     private String email;
     private String phone;
-    private Object status;
+    private String status;
+    private String role;
     private Date lastLoginTime;
     private Date createTime;
 }

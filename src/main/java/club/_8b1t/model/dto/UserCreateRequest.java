@@ -1,9 +1,12 @@
 package club._8b1t.model.dto;
 
+import club._8b1t.model.entity.User;
+import io.github.linpeilie.annotations.AutoMapper;
 import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
 
 @Data
+@AutoMapper(target = User.class)
 public class UserCreateRequest {
 
     @NotBlank(message = "用户名不能为空")

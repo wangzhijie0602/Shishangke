@@ -1,21 +1,17 @@
 package club._8b1t.model.entity;
 
-import club._8b1t.model.vo.UserVO;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.TableLogic;
 import com.baomidou.mybatisplus.annotation.TableName;
-import io.github.linpeilie.annotations.AutoMapper;
-import lombok.Data;
-
 import java.util.Date;
+import lombok.Data;
 
 /**
  * 用户表
- *
  * @TableName user
  */
-@AutoMapper(target = UserVO.class)
-@TableName(value = "user")
+@TableName(value ="user")
 @Data
 public class User {
     /**
@@ -57,7 +53,12 @@ public class User {
     /**
      * 账号状态
      */
-    private Object status;
+    private String status;
+
+    /**
+     * 
+     */
+    private String role;
 
     /**
      * 最后登录时间
@@ -77,5 +78,6 @@ public class User {
     /**
      * 软删除
      */
+    @TableLogic
     private Integer isDeleted;
 }
