@@ -1,24 +1,21 @@
-package club._8b1t.model.dto;
+package club._8b1t.model.dto.user;
 
 import club._8b1t.model.entity.User;
 import io.github.linpeilie.annotations.AutoMapper;
-import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
 
-@AutoMapper(target = User.class)
 @Data
-public class UserUpdateRequest {
+@AutoMapper(target = User.class)
+public class UserCreateRequest {
 
-    @NotNull(message = "用户ID不能为空")
-    private Long id;
-
+    @NotBlank(message = "用户名不能为空")
     private String username;
 
+    @NotBlank(message = "密码不能为空")
     private String password;
 
     private String nickname;
-
-    private String avatar;
 
     private String email;
 

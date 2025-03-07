@@ -2,9 +2,10 @@ package club._8b1t.controller;
 
 import club._8b1t.common.Result;
 import club._8b1t.exception.BusinessException;
-import club._8b1t.model.dto.UserCreateRequest;
-import club._8b1t.model.dto.UserQueryRequest;
-import club._8b1t.model.dto.UserUpdateRequest;
+import club._8b1t.exception.ErrorCode;
+import club._8b1t.model.dto.user.UserCreateRequest;
+import club._8b1t.model.dto.user.UserQueryRequest;
+import club._8b1t.model.dto.user.UserUpdateRequest;
 import club._8b1t.model.entity.User;
 import club._8b1t.model.vo.UserVO;
 import club._8b1t.service.UserService;
@@ -13,17 +14,13 @@ import cn.dev33.satoken.annotation.SaCheckRole;
 import cn.dev33.satoken.secure.BCrypt;
 import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.linpeilie.Converter;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-
-import static club._8b1t.exception.ErrorCode.PARAMS_ERROR;
-import static club._8b1t.exception.ErrorCode.SYSTEM_ERROR;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/v1/admin")
@@ -44,10 +41,10 @@ public class AdminController {
 
     @SaCheckRole("ADMIN")
     @GetMapping("/{id}")
-    public Result<UserVO> get(@PathVariable Long id) {
+    public Result<UserVO> get(@PathVariable String id) {
         User user = userService.getById(id);
         if (user == null) {
-            throw new BusinessException(PARAMS_ERROR, "用户不存在");
+            throw new BusinessException(ErrorCode.PARAMS_ERROR, "用户不存在");
         }
 
         // 创建UserRoleVO对象
@@ -60,7 +57,7 @@ public class AdminController {
     public Result<Void> update(@RequestBody @Valid UserUpdateRequest updateRequest) {
         User user = userService.getById(updateRequest.getId());
         if (user == null) {
-            throw new BusinessException(PARAMS_ERROR, "用户不存在");
+            throw new BusinessException(ErrorCode.PARAMS_ERROR, "用户不存在");
         }
         user.setUsername(updateRequest.getUsername());
         user.setPassword(updateRequest.getPassword());
@@ -72,7 +69,7 @@ public class AdminController {
     }
 
     @GetMapping("/{id}/delete")
-    public Result<Void> delete(@PathVariable Long id) {
+    public Result<Void> delete(@PathVariable String id) {
         userService.removeById(id);
         return ResultUtil.success("删除成功");
     }
@@ -84,7 +81,7 @@ public class AdminController {
      * @return 用户的角色列表
      */
     @GetMapping("/{id}/role")
-    public Result<String> getRole(@PathVariable Long id) {
+    public Result<String> getRole(@PathVariable String id) {
         // 根据用户ID查询用户角色关系
 
         String role = userService.getObj(new LambdaQueryWrapper<>(User.class)
@@ -93,7 +90,7 @@ public class AdminController {
 
         // 如果用户没有角色，则返回空列表
         if (StrUtil.isBlank(role)) {
-            throw new BusinessException(SYSTEM_ERROR, "用户没有角色");
+            throw new BusinessException(ErrorCode.SYSTEM_ERROR, "用户没有角色");
         }
 
         // 返回角色编码列表
@@ -102,10 +99,10 @@ public class AdminController {
 
     @SaCheckRole("ADMIN")
     @GetMapping("/{id}/ban")
-    public Result<Void> ban(@PathVariable Long id) {
+    public Result<Void> ban(@PathVariable String id) {
         User user = userService.getById(id);
         if (user == null) {
-            throw new BusinessException(PARAMS_ERROR, "用户不存在");
+            throw new BusinessException(ErrorCode.PARAMS_ERROR, "用户不存在");
         }
 
         user.setStatus("DISABLED");
@@ -115,10 +112,10 @@ public class AdminController {
     }
 
     @GetMapping("/{id}/unban")
-    public Result<Void> unban(@PathVariable Long id) {
+    public Result<Void> unban(@PathVariable String id) {
         User user = userService.getById(id);
         if (user == null) {
-            throw new BusinessException(PARAMS_ERROR, "用户不存在");
+            throw new BusinessException(ErrorCode.PARAMS_ERROR, "用户不存在");
         }
         user.setStatus("ENABLED");
         userService.updateById(user);
@@ -126,9 +123,9 @@ public class AdminController {
     }
 
     @PostMapping("/list")
-    public Result<IPage<User>> getUserList(@RequestParam(defaultValue = "1") Integer pageNum,
-                                           @RequestParam(defaultValue = "10") Integer pageSize,
-                                           @RequestBody(required = false) UserQueryRequest request) {
+    public Result<Page<UserVO>> getUserList(@RequestParam(defaultValue = "1") Integer pageNum,
+                                            @RequestParam(defaultValue = "10") Integer pageSize,
+                                            @RequestBody(required = false) UserQueryRequest request) {
 
         // 创建一个LambdaQueryWrapper对象，用于构建查询条件
         LambdaQueryWrapper<User> userLambdaQueryWrapper = new LambdaQueryWrapper<>();
@@ -145,9 +142,18 @@ public class AdminController {
         }
         // 创建一个Page对象，用于分页查询
         Page<User> page = new Page<>(pageNum, pageSize);
+        // 调用userService的page方法，执行分页查询，并返回结果
+        Page<User> userPage = userService.page(page, userLambdaQueryWrapper);
+
+        // 将查询结果转换为VO对象
+        Page<UserVO> userVOList = new Page<>(userPage.getCurrent(), userPage.getSize(), userPage.getTotal());
+        userVOList.setRecords(userPage.getRecords().stream()
+                .map(user -> converter.convert(user, UserVO.class))
+                .collect(Collectors.toList()));
+
 
         // 调用userService的page方法，执行分页查询，并返回结果
-        return ResultUtil.success(userService.page(page, userLambdaQueryWrapper));
+        return ResultUtil.success(userVOList);
     }
 
 }

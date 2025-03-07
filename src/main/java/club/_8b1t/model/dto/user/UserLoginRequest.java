@@ -1,4 +1,4 @@
-package club._8b1t.model.dto;
+package club._8b1t.model.dto.user;
 
 import jakarta.validation.constraints.NotBlank;
 import lombok.Data;

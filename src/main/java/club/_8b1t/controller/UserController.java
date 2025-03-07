@@ -2,8 +2,10 @@ package club._8b1t.controller;
 
 import club._8b1t.common.Result;
 import club._8b1t.exception.BusinessException;
-import club._8b1t.model.dto.UserLoginRequest;
-import club._8b1t.model.dto.UserRegisterRequest;
+import club._8b1t.exception.ErrorCode;
+import club._8b1t.model.dto.user.UserChangePassword;
+import club._8b1t.model.dto.user.UserLoginRequest;
+import club._8b1t.model.dto.user.UserRegisterRequest;
 import club._8b1t.model.entity.User;
 import club._8b1t.model.vo.UserVO;
 import club._8b1t.service.UserService;
@@ -20,9 +22,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Date;
-
-import static club._8b1t.exception.ErrorCode.FORBIDDEN_ERROR;
-import static club._8b1t.exception.ErrorCode.PARAMS_ERROR;
 
 @RestController
 @RequestMapping("/api/v1/user")
@@ -42,11 +41,11 @@ public class UserController {
         // 用户不存在
         // 密码错误
         if (user == null || !BCrypt.checkpw(request.getPassword(), user.getPassword())) {
-            throw new BusinessException(PARAMS_ERROR, "用户不存在");
+            throw new BusinessException(ErrorCode.PARAMS_ERROR, "用户不存在");
         }
 
         if ("DISABLED".equals(user.getStatus())) {
-            throw new BusinessException(FORBIDDEN_ERROR, "用户已被禁用");
+            throw new BusinessException(ErrorCode.FORBIDDEN_ERROR, "用户已被禁用");
         }
 
         // 更新最后登录时间
@@ -88,7 +87,7 @@ public class UserController {
         // 查询用户信息
         User user = userService.getById(userId);
         if (user == null) {
-            throw new BusinessException(PARAMS_ERROR, "用户不存在");
+            throw new BusinessException(ErrorCode.PARAMS_ERROR, "用户不存在");
         }
 
         // 创建UserVO对象
@@ -102,4 +101,29 @@ public class UserController {
         StpUtil.logout();
         return ResultUtil.success();
     }
+
+    @PostMapping("/updatePassword")
+    public Result<String> updatePassword(@RequestBody @Valid UserChangePassword request) {
+        // 使用StpUtil工具类获取当前登录用户的ID，并将其转换为Long类型
+        Long userId = StpUtil.getLoginIdAsLong();
+
+        // 使用userService服务类通过用户ID获取用户信息
+        User user = userService.getById(userId);
+        // 如果用户信息为null，抛出一个自定义的业务异常，异常类型为PARAMS_ERROR，异常信息为"用户不存在"
+        if (user == null) {
+            throw new BusinessException(ErrorCode.PARAMS_ERROR, "用户不存在");
+        }
+
+        // 验证原密码
+        if (!BCrypt.checkpw(request.getOldPassword(), user.getPassword())) {
+            throw new BusinessException(ErrorCode.PARAMS_ERROR, "原密码错误");
+        }
+
+        // 更新新密码
+        user.setPassword(BCrypt.hashpw(request.getNewPassword(), BCrypt.gensalt()));
+        userService.updateById(user);
+
+        return ResultUtil.success("密码更新成功");
+    }
+
 }
