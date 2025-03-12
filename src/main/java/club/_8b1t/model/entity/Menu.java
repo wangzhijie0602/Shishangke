@@ -1,10 +1,14 @@
 package club._8b1t.model.entity;
 
+import club._8b1t.model.vo.MenuVO;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.TableLogic;
 import com.baomidou.mybatisplus.annotation.TableName;
 import java.math.BigDecimal;
 import java.util.Date;
+
+import io.github.linpeilie.annotations.AutoMapper;
 import lombok.Data;
 
 /**
@@ -13,6 +17,7 @@ import lombok.Data;
  */
 @TableName(value ="menu")
 @Data
+@AutoMapper(target = MenuVO.class)
 public class Menu {
     /**
      * 菜单项ID，主键，自增
@@ -73,5 +78,6 @@ public class Menu {
     /**
      * 软删除标记
      */
+    @TableLogic
     private Integer isDeleted;
 }
