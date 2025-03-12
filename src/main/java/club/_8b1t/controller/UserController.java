@@ -9,6 +9,7 @@ import club._8b1t.model.dto.user.UserRegisterRequest;
 import club._8b1t.model.entity.User;
 import club._8b1t.model.vo.UserVO;
 import club._8b1t.service.UserService;
+import club._8b1t.service.CosService;
 import club._8b1t.util.ResultUtil;
 import cn.dev33.satoken.secure.BCrypt;
 import cn.dev33.satoken.stp.SaTokenInfo;
@@ -16,20 +17,26 @@ import cn.dev33.satoken.stp.StpUtil;
 import cn.hutool.core.util.RandomUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import io.github.linpeilie.Converter;
+import jakarta.annotation.Resource;
 import jakarta.validation.Valid;
-import lombok.RequiredArgsConstructor;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.Date;
 
 @RestController
 @RequestMapping("/api/v1/user")
-@RequiredArgsConstructor
 public class UserController {
 
-    private final UserService userService;
-    private final Converter converter;
+@Resource
+private UserService userService;
+
+@Resource
+private CosService cosService;
+
+@Resource
+private Converter converter;
 
     @PostMapping("/login")
     public Result<SaTokenInfo> login(@RequestBody @Valid UserLoginRequest request,
@@ -102,6 +109,23 @@ public class UserController {
         return ResultUtil.success();
     }
 
+    @PostMapping("/uploadAvatar")
+    public Result<String> uploadAvatar(@RequestParam("file") MultipartFile file) {
+        Long userId = StpUtil.getLoginIdAsLong();
+        String avatarUrl = cosService.uploadAvatar(userId, file);
+
+        User user = userService.getById(userId);
+        if (user == null) {
+            throw new BusinessException(ErrorCode.PARAMS_ERROR, "用户不存在");
+        }
+        user.setAvatar(avatarUrl);
+        boolean success = userService.updateById(user);
+        if (!success) {
+            throw new BusinessException(ErrorCode.SYSTEM_ERROR, "更新头像失败");
+        }
+        return ResultUtil.success("头像上传成功", avatarUrl);
+    }
+
     @PostMapping("/updatePassword")
     public Result<String> updatePassword(@RequestBody @Valid UserChangePassword request) {
         // 使用StpUtil工具类获取当前登录用户的ID，并将其转换为Long类型
@@ -125,5 +149,6 @@ public class UserController {
 
         return ResultUtil.success("密码更新成功");
     }
+
 
 }

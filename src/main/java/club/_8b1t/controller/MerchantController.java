@@ -7,6 +7,7 @@ import club._8b1t.model.dto.merchant.MerchantCreateRequest;
 import club._8b1t.model.dto.merchant.MerchantQueryRequest;
 import club._8b1t.model.dto.merchant.MerchantUpdateRequest;
 import club._8b1t.model.entity.Merchant;
+import club._8b1t.model.vo.MerchantVO;
 import club._8b1t.service.MerchantService;
 import club._8b1t.util.ResultUtil;
 import cn.dev33.satoken.stp.StpUtil;
@@ -14,22 +15,24 @@ import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.linpeilie.Converter;
+import jakarta.annotation.Resource;
 import jakarta.validation.Valid;
-import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/v1/merchant")
-@RequiredArgsConstructor
 public class MerchantController {
 
-    private final MerchantService merchantService;
-    private final Converter converter;
+    @Resource
+    private MerchantService merchantService;
 
-    @GetMapping("/list")
-    public Result<Page<Merchant>> getMerchantList(@RequestParam(defaultValue = "1") Integer pageNum,
-                                                  @RequestParam(defaultValue = "10") Integer pageSize,
-                                                  @RequestBody(required = false) MerchantQueryRequest request) {
+    @Resource
+    private Converter converter;
+
+    @PostMapping("/list")
+    public Result<Page<MerchantVO>> getMerchantList(@RequestParam(defaultValue = "1") Integer pageNum,
+                                                    @RequestParam(defaultValue = "10") Integer pageSize,
+                                                    @RequestBody(required = false) MerchantQueryRequest request) {
 
         // 获取当前登录用户的ID
         long userId = StpUtil.getLoginIdAsLong();
@@ -44,12 +47,16 @@ public class MerchantController {
 
         Page<Merchant> page = new Page<>(pageNum, pageSize);
         Page<Merchant> merchantList = merchantService.page(page, wrapper);
-        return ResultUtil.success(merchantList);
+
+        Page<MerchantVO> merchantVOList = new Page<>(merchantList.getCurrent(), merchantList.getSize(), merchantList.getTotal());
+        merchantVOList.setRecords(converter.convert(merchantList.getRecords(), MerchantVO.class));
+
+        return ResultUtil.success(merchantVOList);
 
     }
 
     @PostMapping("/create")
-    public Result<?> create(@RequestBody @Valid MerchantCreateRequest request) {
+    public Result<Long> create(@RequestBody @Valid MerchantCreateRequest request) {
 
         // 使用StpUtil工具类获取当前登录用户的ID，并将其转换为long类型
         long userId = StpUtil.getLoginIdAsLong();
@@ -113,6 +120,23 @@ public class MerchantController {
         }
         // 返回删除成功的响应
         return ResultUtil.success("删除成功");
+    }
+
+    @GetMapping("/{id}/get")
+    public Result<MerchantVO> getMerchant(@PathVariable String id) {
+
+        long l = merchantService.count(new LambdaQueryWrapper<>(Merchant.class)
+                .eq(Merchant::getId, id)
+                .eq(Merchant::getUserId, StpUtil.getLoginIdAsLong()));
+
+        if (l == 0) {
+            throw new BusinessException(ErrorCode.NOT_FOUND_ERROR);
+        }
+
+        Merchant merchant = merchantService.getById(id);
+
+        return ResultUtil.success(converter.convert(merchant, MerchantVO.class));
+
     }
 
 }

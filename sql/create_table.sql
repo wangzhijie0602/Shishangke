@@ -44,4 +44,23 @@ CREATE TABLE `merchant`
   COLLATE = utf8mb4_0900_ai_ci;
 
 
+CREATE TABLE `menu` (
+                        `menu_id`          INT          NOT NULL AUTO_INCREMENT COMMENT '菜单项ID，主键，自增',
+                        `merchant_id`      BIGINT          NOT NULL COMMENT '所属商家ID（外键关联 merchant.id）',
+                        `name`             VARCHAR(100) NOT NULL COMMENT '菜品名称',
+                        `description`      TEXT                  DEFAULT NULL COMMENT '菜品描述',
+                        `price`            DECIMAL(10, 2) NOT NULL COMMENT '菜品价格（单位：元）',
+                        `category`         VARCHAR(50)   NOT NULL COMMENT '菜品分类',
+                        `image_url`        VARCHAR(255)  DEFAULT NULL COMMENT '菜品图片URL',
+                        `status`           VARCHAR(10)   NOT NULL DEFAULT 'ENABLED' COMMENT '菜品状态',
+                        `sort_order`       INT           NOT NULL DEFAULT 0 COMMENT '排序权重（数值越小越靠前）',
+                        `created_at`       TIMESTAMP     NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+                        `updated_at`       TIMESTAMP     NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+                        `is_deleted`       TINYINT(1)    NOT NULL DEFAULT 0 COMMENT '软删除标记',
+                        PRIMARY KEY (`menu_id`),
+                        KEY `idx_merchant_id` (`merchant_id`)
+) ENGINE = InnoDB
+  DEFAULT CHARSET = utf8mb4
+  COLLATE = utf8mb4_0900_ai_ci COMMENT='菜单表';
+
 

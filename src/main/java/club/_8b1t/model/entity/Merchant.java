@@ -1,11 +1,14 @@
 package club._8b1t.model.entity;
 
+import club._8b1t.model.vo.MerchantVO;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableLogic;
 import com.baomidou.mybatisplus.annotation.TableName;
 import java.math.BigDecimal;
 import java.util.Date;
+
+import io.github.linpeilie.annotations.AutoMapper;
 import lombok.Data;
 
 /**
@@ -14,6 +17,7 @@ import lombok.Data;
  */
 @TableName(value ="merchant")
 @Data
+@AutoMapper(target = MerchantVO.class)
 public class Merchant {
     /**
      * 商家ID，主键，自增
@@ -86,7 +90,7 @@ public class Merchant {
     /**
      * 商家状态
      */
-    private Object status;
+    private String status;
 
     /**
      * 创建时间

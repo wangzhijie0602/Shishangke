@@ -16,6 +16,7 @@ import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.linpeilie.Converter;
+import jakarta.annotation.Resource;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -24,12 +25,14 @@ import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/v1/admin")
-@RequiredArgsConstructor
 @SaCheckRole("ADMIN")
 public class AdminController {
 
-    private final UserService userService;
-    private final Converter converter;
+    @Resource
+    private UserService userService;
+
+    @Resource
+    private Converter converter;
 
     @PostMapping
     public Result<Long> create(@RequestBody @Valid UserCreateRequest request) {
@@ -147,9 +150,7 @@ public class AdminController {
 
         // 将查询结果转换为VO对象
         Page<UserVO> userVOList = new Page<>(userPage.getCurrent(), userPage.getSize(), userPage.getTotal());
-        userVOList.setRecords(userPage.getRecords().stream()
-                .map(user -> converter.convert(user, UserVO.class))
-                .collect(Collectors.toList()));
+        userVOList.setRecords(converter.convert(userPage.getRecords(), UserVO.class));
 
 
         // 调用userService的page方法，执行分页查询，并返回结果

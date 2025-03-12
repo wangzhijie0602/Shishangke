@@ -8,7 +8,7 @@ import lombok.Data;
 @AutoMapper(target = Merchant.class)
 public class MerchantUpdateRequest {
 
-    private Long id;
+    private String id;
 
     private String name;
 

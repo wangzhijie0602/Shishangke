@@ -4,13 +4,15 @@ server:
 spring:
   application:
     name: Shishangke
+  profiles:
+    active: local
   data:
     # redis配置
     redis:
       # Redis数据库索引（默认为0）
       database: 0
       # Redis服务器地址
-      host: ubuntu
+      host: fnos
       # Redis服务器连接端口
       port: 6379
       # Redis服务器连接密码（默认为空）
@@ -29,7 +31,7 @@ spring:
           min-idle: 0
 
   datasource:
-    url: jdbc:mysql://ubuntu:3306/Shishangke
+    url: jdbc:mysql://fnos:3306/Shishangke
     username: root
     password: Shishangke
     driver-class-name: com.mysql.cj.jdbc.Driver
@@ -127,3 +129,6 @@ sa-token:
   token-style: simple-uuid
   # 是否输出操作日志
   is-log: true
+
+
+
