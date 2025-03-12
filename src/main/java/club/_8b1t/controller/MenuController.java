@@ -8,8 +8,10 @@ import club._8b1t.model.dto.menu.MenuQueryRequest;
 import club._8b1t.model.dto.menu.MenuUpdateRequest;
 import club._8b1t.model.entity.Menu;
 import club._8b1t.model.vo.MenuVO;
+import club._8b1t.service.CosService;
 import club._8b1t.service.MenuService;
 import club._8b1t.util.ResultUtil;
+import cn.dev33.satoken.stp.StpUtil;
 import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -17,6 +19,7 @@ import io.github.linpeilie.Converter;
 import jakarta.annotation.Resource;
 import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @RequestMapping("/api/v1/menu")
@@ -27,6 +30,9 @@ public class MenuController {
 
     @Resource
     private Converter converter;
+
+    @Resource
+    private CosService cosService;
 
     /**
      * 分页查询菜单列表
@@ -161,16 +167,34 @@ public class MenuController {
      * 根据商家ID获取菜单列表
      *
      * @param merchantId 商家ID
+     * @param pageNum 页码
+     * @param pageSize 每页数量
+     * @param request 查询条件
      * @return 菜单列表
      */
-    @GetMapping("/merchant/{merchantId}")
+    @PostMapping("/merchant/{merchantId}")
     public Result<Page<MenuVO>> getMenuByMerchant(@PathVariable String merchantId,
-                                                 @RequestParam(defaultValue = "1") Integer pageNum,
-                                                 @RequestParam(defaultValue = "50") Integer pageSize) {
+                                                  @RequestParam(defaultValue = "1") Integer pageNum,
+                                                  @RequestParam(defaultValue = "50") Integer pageSize,
+                                                  @RequestBody(required = false) MenuQueryRequest request) {
         LambdaQueryWrapper<Menu> wrapper = new LambdaQueryWrapper<Menu>()
                 .eq(Menu::getMerchantId, merchantId)
-                .eq(Menu::getIsDeleted, 0)
-                .orderByAsc(Menu::getSortOrder);
+                .eq(Menu::getIsDeleted, 0);
+
+        if (request != null) {
+            // 根据菜品名称模糊查询
+            wrapper.like(StrUtil.isNotBlank(request.getName()), Menu::getName, request.getName());
+            // 根据菜品分类查询
+            wrapper.eq(StrUtil.isNotBlank(request.getCategory()), Menu::getCategory, request.getCategory());
+            // 根据菜品状态查询
+            wrapper.eq(StrUtil.isNotBlank(request.getStatus()), Menu::getStatus, request.getStatus());
+            // 根据价格范围查询
+            wrapper.ge(request.getMinPrice() != null, Menu::getPrice, request.getMinPrice());
+            wrapper.le(request.getMaxPrice() != null, Menu::getPrice, request.getMaxPrice());
+        }
+
+        // 按照排序权重升序排列
+        wrapper.orderByAsc(Menu::getSortOrder);
 
         Page<Menu> page = new Page<>(pageNum, pageSize);
         Page<Menu> menuList = menuService.page(page, wrapper);
@@ -179,5 +203,21 @@ public class MenuController {
         menuVOList.setRecords(converter.convert(menuList.getRecords(), MenuVO.class));
 
         return ResultUtil.success(menuVOList);
+    }
+
+    /**
+     * 上传菜品图片
+     *
+     * @param file 图片文件
+     * @return 图片URL
+     */
+    @PostMapping("/upload/image")
+    public Result<String> uploadImage(@RequestParam("file") MultipartFile file) {
+        if (file == null || file.isEmpty()) {
+            throw new BusinessException(ErrorCode.PARAMS_ERROR, "请选择要上传的图片");
+        }
+        Long userId = StpUtil.getLoginIdAsLong();
+        String imageUrl = cosService.uploadDishImage(userId, file);
+        return ResultUtil.success("图片上传成功", imageUrl);
     }
 } 

@@ -64,3 +64,24 @@ CREATE TABLE `menu` (
   COLLATE = utf8mb4_0900_ai_ci COMMENT='菜单表';
 
 
+CREATE TABLE `merchant_review` (
+                                   `review_id`     BIGINT        NOT NULL AUTO_INCREMENT COMMENT '评价ID，主键，自增',
+                                   `user_id`       BIGINT        NOT NULL COMMENT '评价用户ID（外键关联 user.id）',
+                                   `merchant_id`   INT           NOT NULL COMMENT '商家ID（外键关联 merchant.id）',
+                                   `content`       TEXT          DEFAULT NULL COMMENT '评价内容（文字评论）',
+                                   `rating`        DECIMAL(3,1)  NOT NULL COMMENT '评分（1.0 ~ 5.0）',
+                                   `images`        TEXT          DEFAULT NULL COMMENT '评价图片URL（JSON数组格式，如["url1", "url2"]）',
+                                   `is_anonymous`  TINYINT(1)    NOT NULL DEFAULT 0 COMMENT '是否匿名（0: 否，1: 是）',
+                                   `created_at`    TIMESTAMP     NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '评价创建时间',
+                                   `updated_at`    TIMESTAMP     NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '最后更新时间',
+                                   `is_deleted`    TINYINT(1)    NOT NULL DEFAULT 0 COMMENT '软删除标记',
+                                   PRIMARY KEY (`review_id`),
+                                   KEY `idx_user_id` (`user_id`),
+                                   KEY `idx_merchant_id` (`merchant_id`),
+                                   FOREIGN KEY (`user_id`) REFERENCES `user`(`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+                                   FOREIGN KEY (`merchant_id`) REFERENCES `merchant`(`id`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE = InnoDB
+  DEFAULT CHARSET = utf8mb4
+  COLLATE = utf8mb4_0900_ai_ci COMMENT='商家评价表';
+
+

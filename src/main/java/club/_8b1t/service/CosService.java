@@ -13,4 +13,19 @@ public interface CosService {
      * @return 文件访问URL
      */
     String uploadAvatar(Long userId, MultipartFile file);
+
+    /**
+     * 通用图片上传
+     * @param file 图片文件
+     * @param directory 存储目录
+     * @return 文件访问URL
+     */
+    String uploadImage(MultipartFile file, String directory);
+
+    /**
+     * 上传菜品图片
+     * @param file 菜品图片文件
+     * @return 文件访问URL
+     */
+    String uploadDishImage(Long userId, MultipartFile file);
 }
