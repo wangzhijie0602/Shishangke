@@ -26,4 +26,7 @@ public class MerchantUpdateRequest {
 
     private String description;
 
+    private String openTime;
+
+    private String closeTime;
 }

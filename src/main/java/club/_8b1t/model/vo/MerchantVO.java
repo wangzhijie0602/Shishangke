@@ -28,9 +28,9 @@ public class MerchantVO {
 
     private String addressDetail;
 
-    private Date openTime;
+    private String openTime;
 
-    private Date closeTime;
+    private String closeTime;
 
     private String description;
 

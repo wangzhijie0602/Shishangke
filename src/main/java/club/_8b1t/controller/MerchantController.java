@@ -19,6 +19,8 @@ import jakarta.annotation.Resource;
 import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.*;
 
+import java.math.BigDecimal;
+
 @RestController
 @RequestMapping("/api/v1/merchant")
 public class MerchantController {
@@ -76,40 +78,224 @@ public class MerchantController {
 
     @PostMapping("/update")
     public Result<String> update(@RequestBody @Valid MerchantUpdateRequest request) {
-
         // 获取当前登录用户的ID
         long userId = StpUtil.getLoginIdAsLong();
-        // 查询当前用户ID对应的商家记录数量
-        long l = merchantService.count(new LambdaQueryWrapper<>(Merchant.class)
-                .eq(Merchant::getUserId, userId)
-                .eq(Merchant::getId, request.getId()));
-        // 如果没有找到对应的商家记录，抛出异常
-        if (l == 0) {
-            throw new BusinessException(ErrorCode.NOT_FOUND_ERROR);
+        
+        // 验证商家所有权
+        Merchant merchant = merchantService.getMerchantByIdAndUserId(Long.valueOf(request.getId()), userId);
+        if (merchant == null) {
+            throw new BusinessException(ErrorCode.NOT_FOUND_ERROR, "商家不存在或您无权修改");
         }
+        
         // 将请求参数转换为商家对象
-        Merchant merchant = converter.convert(request, Merchant.class);
+        Merchant updatedMerchant = converter.convert(request, Merchant.class);
+        // 确保不修改商家所有者
+        updatedMerchant.setUserId(userId);
+        
         // 更新商家信息
-        boolean updated = merchantService.updateById(merchant);
+        boolean updated = merchantService.updateMerchantInfo(updatedMerchant);
+        
         // 如果更新失败，抛出系统异常
         if (!updated) {
-            throw new BusinessException(ErrorCode.SYSTEM_ERROR);
+            throw new BusinessException(ErrorCode.SYSTEM_ERROR, "更新失败");
         }
+        
         // 返回更新成功的响应
         return ResultUtil.success("更新成功");
-
+    }
+    
+    /**
+     * 更新商家名称
+     */
+    @PostMapping("/{id}/update-name")
+    public Result<String> updateName(@PathVariable Long id, @RequestParam String name) {
+        long userId = StpUtil.getLoginIdAsLong();
+        
+        // 验证商家所有权
+        Merchant merchant = merchantService.getMerchantByIdAndUserId(id, userId);
+        if (merchant == null) {
+            throw new BusinessException(ErrorCode.NOT_FOUND_ERROR, "商家不存在或您无权修改");
+        }
+        
+        boolean updated = merchantService.updateName(id, name);
+        
+        if (!updated) {
+            throw new BusinessException(ErrorCode.SYSTEM_ERROR, "更新失败");
+        }
+        
+        return ResultUtil.success("名称更新成功");
+    }
+    
+    /**
+     * 更新商家Logo
+     */
+    @PostMapping("/{id}/update-logo")
+    public Result<String> updateLogo(@PathVariable Long id, @RequestParam String logo) {
+        long userId = StpUtil.getLoginIdAsLong();
+        
+        // 验证商家所有权
+        Merchant merchant = merchantService.getMerchantByIdAndUserId(id, userId);
+        if (merchant == null) {
+            throw new BusinessException(ErrorCode.NOT_FOUND_ERROR, "商家不存在或您无权修改");
+        }
+        
+        boolean updated = merchantService.updateLogo(id, logo);
+        
+        if (!updated) {
+            throw new BusinessException(ErrorCode.SYSTEM_ERROR, "更新失败");
+        }
+        
+        return ResultUtil.success("Logo更新成功");
+    }
+    
+    /**
+     * 更新商家联系电话
+     */
+    @PostMapping("/{id}/update-phone")
+    public Result<String> updatePhone(@PathVariable Long id, @RequestParam String phone) {
+        long userId = StpUtil.getLoginIdAsLong();
+        
+        // 验证商家所有权
+        Merchant merchant = merchantService.getMerchantByIdAndUserId(id, userId);
+        if (merchant == null) {
+            throw new BusinessException(ErrorCode.NOT_FOUND_ERROR, "商家不存在或您无权修改");
+        }
+        
+        boolean updated = merchantService.updatePhone(id, phone);
+        
+        if (!updated) {
+            throw new BusinessException(ErrorCode.SYSTEM_ERROR, "更新失败");
+        }
+        
+        return ResultUtil.success("联系电话更新成功");
+    }
+    
+    /**
+     * 更新商家地址
+     */
+    @PostMapping("/{id}/update-address")
+    public Result<String> updateAddress(@PathVariable Long id, 
+                                        @RequestParam String province,
+                                        @RequestParam String city,
+                                        @RequestParam String district,
+                                        @RequestParam String street,
+                                        @RequestParam String addressDetail) {
+        long userId = StpUtil.getLoginIdAsLong();
+        
+        // 验证商家所有权
+        Merchant merchant = merchantService.getMerchantByIdAndUserId(id, userId);
+        if (merchant == null) {
+            throw new BusinessException(ErrorCode.NOT_FOUND_ERROR, "商家不存在或您无权修改");
+        }
+        
+        boolean updated = merchantService.updateAddress(id, province, city, district, street, addressDetail);
+        
+        if (!updated) {
+            throw new BusinessException(ErrorCode.SYSTEM_ERROR, "更新失败");
+        }
+        
+        return ResultUtil.success("地址更新成功");
+    }
+    
+    /**
+     * 更新商家营业时间
+     */
+    @PostMapping("/{id}/update-business-hours")
+    public Result<String> updateBusinessHours(@PathVariable Long id, 
+                                            @RequestParam String openTime,
+                                            @RequestParam String closeTime) {
+        long userId = StpUtil.getLoginIdAsLong();
+        
+        // 验证商家所有权
+        Merchant merchant = merchantService.getMerchantByIdAndUserId(id, userId);
+        if (merchant == null) {
+            throw new BusinessException(ErrorCode.NOT_FOUND_ERROR, "商家不存在或您无权修改");
+        }
+        
+        boolean updated = merchantService.updateBusinessHours(id, openTime, closeTime);
+        
+        if (!updated) {
+            throw new BusinessException(ErrorCode.SYSTEM_ERROR, "更新失败");
+        }
+        
+        return ResultUtil.success("营业时间更新成功");
+    }
+    
+    /**
+     * 更新商家描述
+     */
+    @PostMapping("/{id}/update-description")
+    public Result<String> updateDescription(@PathVariable Long id, @RequestParam String description) {
+        long userId = StpUtil.getLoginIdAsLong();
+        
+        // 验证商家所有权
+        Merchant merchant = merchantService.getMerchantByIdAndUserId(id, userId);
+        if (merchant == null) {
+            throw new BusinessException(ErrorCode.NOT_FOUND_ERROR, "商家不存在或您无权修改");
+        }
+        
+        boolean updated = merchantService.updateDescription(id, description);
+        
+        if (!updated) {
+            throw new BusinessException(ErrorCode.SYSTEM_ERROR, "更新失败");
+        }
+        
+        return ResultUtil.success("描述更新成功");
+    }
+    
+    /**
+     * 更新商家最低起送价
+     */
+    @PostMapping("/{id}/update-min-price")
+    public Result<String> updateMinPrice(@PathVariable Long id, @RequestParam BigDecimal minPrice) {
+        long userId = StpUtil.getLoginIdAsLong();
+        
+        // 验证商家所有权
+        Merchant merchant = merchantService.getMerchantByIdAndUserId(id, userId);
+        if (merchant == null) {
+            throw new BusinessException(ErrorCode.NOT_FOUND_ERROR, "商家不存在或您无权修改");
+        }
+        
+        boolean updated = merchantService.updateMinPrice(id, minPrice);
+        
+        if (!updated) {
+            throw new BusinessException(ErrorCode.SYSTEM_ERROR, "更新失败");
+        }
+        
+        return ResultUtil.success("最低起送价更新成功");
+    }
+    
+    /**
+     * 更新商家状态
+     */
+    @PostMapping("/{id}/update-status")
+    public Result<String> updateStatus(@PathVariable Long id, @RequestParam String status) {
+        long userId = StpUtil.getLoginIdAsLong();
+        
+        // 验证商家所有权
+        Merchant merchant = merchantService.getMerchantByIdAndUserId(id, userId);
+        if (merchant == null) {
+            throw new BusinessException(ErrorCode.NOT_FOUND_ERROR, "商家不存在或您无权修改");
+        }
+        
+        boolean updated = merchantService.updateStatus(id, status);
+        
+        if (!updated) {
+            throw new BusinessException(ErrorCode.SYSTEM_ERROR, "更新失败");
+        }
+        
+        return ResultUtil.success("状态更新成功");
     }
 
     @GetMapping("/{id}/delete")
     public Result<String> delete(@PathVariable String id) {
         // 获取当前登录用户的ID
         long userId = StpUtil.getLoginIdAsLong();
-        // 查询当前用户ID对应的商家记录数量
-        long l = merchantService.count(new LambdaQueryWrapper<>(Merchant.class)
-                .eq(Merchant::getUserId, userId)
-                .eq(Merchant::getId, id));
-        if (l == 0) {
-            throw new BusinessException(ErrorCode.NOT_FOUND_ERROR);
+        
+        // 验证商家所有权
+        Merchant merchant = merchantService.getMerchantByIdAndUserId(Long.valueOf(id), userId);
+        if (merchant == null) {
+            throw new BusinessException(ErrorCode.NOT_FOUND_ERROR, "商家不存在或您无权修改");
         }
 
         // 删除商家信息
@@ -124,19 +310,14 @@ public class MerchantController {
 
     @GetMapping("/{id}/get")
     public Result<MerchantVO> getMerchant(@PathVariable String id) {
-
-        long l = merchantService.count(new LambdaQueryWrapper<>(Merchant.class)
-                .eq(Merchant::getId, id)
-                .eq(Merchant::getUserId, StpUtil.getLoginIdAsLong()));
-
-        if (l == 0) {
-            throw new BusinessException(ErrorCode.NOT_FOUND_ERROR);
+        long userId = StpUtil.getLoginIdAsLong();
+        
+        // 验证商家所有权
+        Merchant merchant = merchantService.getMerchantByIdAndUserId(Long.valueOf(id), userId);
+        if (merchant == null) {
+            throw new BusinessException(ErrorCode.NOT_FOUND_ERROR, "商家不存在或您无权查看");
         }
 
-        Merchant merchant = merchantService.getById(id);
-
         return ResultUtil.success(converter.convert(merchant, MerchantVO.class));
-
     }
-
 }

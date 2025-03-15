@@ -68,14 +68,14 @@ public class Merchant {
     private String addressDetail;
 
     /**
-     * 每日开店时间，如09:00
+     * 每日开店时间，格式：HH:mm
      */
-    private Date openTime;
+    private String openTime;
 
     /**
-     * 每日关店时间，如22:00
+     * 每日关店时间，格式：HH:mm
      */
-    private Date closeTime;
+    private String closeTime;
 
     /**
      * 商家描述信息
