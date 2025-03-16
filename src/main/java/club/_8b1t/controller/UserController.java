@@ -13,6 +13,9 @@ import club._8b1t.service.UserService;
 import club._8b1t.util.ResultUtil;
 import cn.dev33.satoken.stp.SaTokenInfo;
 import cn.dev33.satoken.stp.StpUtil;
+import cn.dev33.satoken.secure.BCrypt;
+import cn.hutool.core.util.RandomUtil;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import io.github.linpeilie.Converter;
 import jakarta.annotation.Resource;
 import jakarta.validation.Valid;
@@ -32,8 +35,19 @@ public class UserController {
     @PostMapping("/login")
     public Result<SaTokenInfo> login(@RequestBody @Valid UserLoginRequest request,
                                      @RequestParam(defaultValue = "false") Boolean remember) {
-        // 使用Service层登录
-        User user = userService.login(request.getUsername(), request.getPassword());
+        // 根据用户名查询用户
+        User user = userService.getOne(new LambdaQueryWrapper<User>()
+                .eq(User::getUsername, request.getUsername()));
+
+        // 用户不存在或密码错误
+        if (user == null || !BCrypt.checkpw(request.getPassword(), user.getPassword())) {
+            throw new BusinessException(ErrorCode.PARAMS_ERROR, "用户不存在或密码错误");
+        }
+
+        // 检查用户状态
+        if ("DISABLED".equals(user.getStatus())) {
+            throw new BusinessException(ErrorCode.FORBIDDEN_ERROR, "用户已被禁用");
+        }
         
         // 使用Sa-Token记录登录状态
         StpUtil.login(user.getId(), remember);
@@ -43,9 +57,26 @@ public class UserController {
 
     @PostMapping("/register")
     public Result<Long> register(@RequestBody @Valid UserRegisterRequest request) {
-        // 使用Service层注册
-        Long userId = userService.register(request.getUsername(), request.getPassword());
-        return ResultUtil.success("注册成功", userId);
+        String username = request.getUsername();
+        String password = request.getPassword();
+        
+        // 检查用户名是否已存在
+        if (userService.count(new LambdaQueryWrapper<User>()
+                .eq(User::getUsername, username)) > 0) {
+            throw new BusinessException(ErrorCode.PARAMS_ERROR, "用户名已存在");
+        }
+
+        // 创建用户对象
+        User user = new User();
+        user.setUsername(username);
+        user.setPassword(BCrypt.hashpw(password, BCrypt.gensalt()));
+        user.setNickname("用户" + RandomUtil.randomString(8));
+        user.setStatus("ENABLED"); // 默认启用状态
+
+        // 保存用户
+        userService.save(user);
+
+        return ResultUtil.success("注册成功", user.getId());
     }
 
     @GetMapping("/current")

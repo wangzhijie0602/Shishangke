@@ -15,25 +15,9 @@ import java.util.Date;
 public interface UserService extends IService<User> {
     
     /**
-     * 用户登录
-     * @param username 用户名
-     * @param password 密码 
-     * @return 登录用户信息
-     */
-    User login(String username, String password);
-    
-    /**
-     * 简单创建用户
-     * @param username 用户名
-     * @param password 密码
-     * @return 用户ID
-     */
-    Long register(String username, String password);
-    
-    /**
      * 获取用户对象
      * @param userId 用户ID
-     * @return 用户VO对象
+     * @return 用户对象
      */
     User getUser(Long userId);
     
@@ -105,4 +89,23 @@ public interface UserService extends IService<User> {
      * @return 用户分页列表
      */
     Page<User> listUsers(int pageNum, int pageSize, String username, String nickname, String phone, String status);
+    
+    /**
+     * 管理员创建用户
+     * @param username 用户名
+     * @param password 密码
+     * @param nickname 昵称
+     * @param email 邮箱
+     * @param phone 电话
+     * @param role 角色
+     * @return 用户ID
+     */
+    Long createUser(String username, String password, String nickname, String email, String phone, String role);
+    
+    /**
+     * 更新用户信息
+     * @param user 用户信息
+     * @return 是否成功
+     */
+    boolean updateUserInfo(User user);
 }

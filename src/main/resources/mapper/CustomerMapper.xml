@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="club._8b1t.mapper.CustomerMapper">
+
+    <resultMap id="BaseResultMap" type="club._8b1t.model.entity.Customer">
+            <id property="customerId" column="customer_id" />
+            <result property="userId" column="user_id" />
+            <result property="realName" column="real_name" />
+            <result property="gender" column="gender" />
+            <result property="birthDate" column="birth_date" />
+            <result property="defaultAddress" column="default_address" />
+            <result property="preferences" column="preferences" />
+            <result property="vipLevel" column="vip_level" />
+            <result property="points" column="points" />
+            <result property="createdAt" column="created_at" />
+            <result property="updatedAt" column="updated_at" />
+            <result property="isDeleted" column="is_deleted" />
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        customer_id,user_id,real_name,gender,birth_date,default_address,
+        preferences,vip_level,points,created_at,updated_at,
+        is_deleted
+    </sql>
+</mapper>

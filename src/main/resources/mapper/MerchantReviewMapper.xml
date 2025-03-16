@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="club._8b1t.mapper.MerchantReviewMapper">
+
+    <resultMap id="BaseResultMap" type="club._8b1t.model.entity.MerchantReview">
+            <id property="reviewId" column="review_id" />
+            <result property="userId" column="user_id" />
+            <result property="merchantId" column="merchant_id" />
+            <result property="content" column="content" />
+            <result property="rating" column="rating" />
+            <result property="images" column="images" />
+            <result property="isAnonymous" column="is_anonymous" />
+            <result property="createdAt" column="created_at" />
+            <result property="updatedAt" column="updated_at" />
+            <result property="isDeleted" column="is_deleted" />
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        review_id,user_id,merchant_id,content,rating,images,
+        is_anonymous,created_at,updated_at,is_deleted
+    </sql>
+</mapper>

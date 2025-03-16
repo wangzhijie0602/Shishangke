@@ -156,9 +156,13 @@ public class AdminController {
         String status = request != null ? request.getStatus() : null;
         
         // 查询用户列表
-        Page<UserVO> userVOList = userService.listUsers(pageNum, pageSize, username, nickname, phone, status);
+        Page<User> userPage = userService.listUsers(pageNum, pageSize, username, nickname, phone, status);
         
-        return ResultUtil.success(userVOList);
+        // 将Page<User>转换为Page<UserVO>
+        Page<UserVO> userVOPage = new Page<>(userPage.getCurrent(), userPage.getSize(), userPage.getTotal());
+        userVOPage.setRecords(converter.convert(userPage.getRecords(), UserVO.class));
+        
+        return ResultUtil.success(userVOPage);
     }
 
     /**

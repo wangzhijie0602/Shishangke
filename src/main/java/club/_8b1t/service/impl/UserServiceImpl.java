@@ -32,49 +32,6 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
     @Resource
     private CosService cosService;
 
-    @Resource
-    private Converter converter;
-
-    @Override
-    public User login(String username, String password) {
-        // 根据用户名查询用户
-        User user = this.getOne(new LambdaQueryWrapper<User>()
-                .eq(User::getUsername, username));
-
-        // 用户不存在或密码错误
-        if (user == null || !BCrypt.checkpw(password, user.getPassword())) {
-            throw new BusinessException(ErrorCode.PARAMS_ERROR, "用户不存在或密码错误");
-        }
-
-        // 检查用户状态
-        if ("DISABLED".equals(user.getStatus())) {
-            throw new BusinessException(ErrorCode.FORBIDDEN_ERROR, "用户已被禁用");
-        }
-
-        return user;
-    }
-
-    @Override
-    public Long register(String username, String password) {
-        // 检查用户名是否已存在
-        if (this.count(new LambdaQueryWrapper<User>()
-                .eq(User::getUsername, username)) > 0) {
-            throw new BusinessException(ErrorCode.PARAMS_ERROR, "用户名已存在");
-        }
-
-        // 创建用户对象
-        User user = new User();
-        user.setUsername(username);
-        user.setPassword(BCrypt.hashpw(password, BCrypt.gensalt()));
-        user.setNickname("用户" + RandomUtil.randomString(8));
-        user.setStatus("ENABLED"); // 默认启用状态
-
-        // 保存用户
-        this.save(user);
-
-        return user.getId();
-    }
-
     @Override
     public User getUser(Long userId) {
         // 查询用户信息
@@ -182,7 +139,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
 
     @Override
     public boolean updateLastLoginTime(Long userId, Date lastLoginTime) {
-        this.existsById();
+        this.existsById(userId);
 
         LambdaUpdateWrapper<User> updateWrapper = new LambdaUpdateWrapper<User>()
                 .eq(User::getId, userId)
@@ -206,12 +163,56 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
 
         return this.page(page, queryWrapper);
     }
+    
+    @Override
+    public Long createUser(String username, String password, String nickname, String email, String phone, String role) {
+        // 检查用户名是否已存在
+        if (this.count(new LambdaQueryWrapper<User>()
+                .eq(User::getUsername, username)) > 0) {
+            throw new BusinessException(ErrorCode.PARAMS_ERROR, "用户名已存在");
+        }
 
-    private void existsById(Long id) {
-        boolean b = this.count(new LambdaQueryWrapper<User>().eq(User::getId, id)) > 0;
-        if (!b) {
+        // 创建用户对象
+        User user = new User();
+        user.setUsername(username);
+        user.setPassword(BCrypt.hashpw(password, BCrypt.gensalt()));
+        user.setNickname(nickname != null ? nickname : "用户" + RandomUtil.randomString(8));
+        user.setEmail(email);
+        user.setPhone(phone);
+        user.setRole(role);
+        user.setStatus("ENABLED"); // 默认启用状态
+
+        // 保存用户
+        this.save(user);
+
+        return user.getId();
+    }
+    
+    @Override
+    public boolean updateUserInfo(User user) {
+        if (user == null || user.getId() == null) {
+            throw new BusinessException(ErrorCode.PARAMS_ERROR, "用户信息不完整");
+        }
+        
+        // 验证用户是否存在
+        if (!this.existsById(user.getId())) {
             throw new BusinessException(ErrorCode.PARAMS_ERROR, "用户不存在");
         }
+        
+        // 如果密码不为空，则加密密码
+        if (StrUtil.isNotBlank(user.getPassword())) {
+            user.setPassword(BCrypt.hashpw(user.getPassword(), BCrypt.gensalt()));
+        } else {
+            // 设置为null，防止更新为空字符串
+            user.setPassword(null);
+        }
+        
+        // 更新用户信息
+        return this.updateById(user);
+    }
+
+    private Boolean existsById(Long id) {
+        return this.count(new LambdaQueryWrapper<User>().eq(User::getId, id)) > 0;
     }
 }
 
