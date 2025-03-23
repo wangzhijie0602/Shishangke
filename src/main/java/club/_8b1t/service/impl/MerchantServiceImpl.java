@@ -2,6 +2,8 @@ package club._8b1t.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import club._8b1t.model.entity.Merchant;
 import club._8b1t.service.MerchantService;
@@ -27,6 +29,12 @@ public class MerchantServiceImpl extends ServiceImpl<MerchantMapper, Merchant>
                 .eq(Merchant::getUserId, userId);
         
         return this.getOne(queryWrapper);
+    }
+
+    @Override
+    public Page<Merchant> getMerchantPage(Integer pageNumber, Integer pageSize) {
+        Page<Merchant> page = new Page<>(pageNumber, pageSize);
+        return this.page(page);
     }
 
     @Override

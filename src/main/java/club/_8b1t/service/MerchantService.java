@@ -1,6 +1,7 @@
 package club._8b1t.service;
 
 import club._8b1t.model.entity.Merchant;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
 
 /**
@@ -18,6 +19,8 @@ public interface MerchantService extends IService<Merchant> {
      * @return 如果商家存在且属于该用户，返回商家对象；否则返回null
      */
     Merchant getMerchantByIdAndUserId(Long merchantId, Long userId);
+
+    Page<Merchant> getMerchantPage(Integer pageNumber, Integer pageSize);
     
     /**
      * 更新商家基本信息

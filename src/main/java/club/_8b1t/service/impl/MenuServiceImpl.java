@@ -1,10 +1,13 @@
 package club._8b1t.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import club._8b1t.model.entity.Menu;
 import club._8b1t.service.MenuService;
 import club._8b1t.mapper.MenuMapper;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 /**
 * @author 8bit
@@ -15,6 +18,11 @@ import org.springframework.stereotype.Service;
 public class MenuServiceImpl extends ServiceImpl<MenuMapper, Menu>
     implements MenuService{
 
+    @Override
+    public List<Menu> getMenuByMerchantId(Long merchantId) {
+        return this.list(new LambdaQueryWrapper<>(Menu.class)
+                .eq(Menu::getMerchantId, merchantId));
+    }
 }
 
 

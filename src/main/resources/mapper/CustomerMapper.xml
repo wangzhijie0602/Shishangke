@@ -5,12 +5,13 @@
 <mapper namespace="club._8b1t.mapper.CustomerMapper">
 
     <resultMap id="BaseResultMap" type="club._8b1t.model.entity.Customer">
-            <id property="customerId" column="customer_id" />
-            <result property="userId" column="user_id" />
-            <result property="realName" column="real_name" />
+            <id property="id" column="id" />
+            <result property="username" column="username" />
+            <result property="password" column="password" />
+            <result property="nickname" column="nickname" />
+            <result property="avatar" column="avatar" />
             <result property="gender" column="gender" />
             <result property="birthDate" column="birth_date" />
-            <result property="defaultAddress" column="default_address" />
             <result property="preferences" column="preferences" />
             <result property="vipLevel" column="vip_level" />
             <result property="points" column="points" />
@@ -20,7 +21,7 @@
     </resultMap>
 
     <sql id="Base_Column_List">
-        customer_id,user_id,real_name,gender,birth_date,default_address,
+        id,username,password,nickname,avatar,gender,birth_date,
         preferences,vip_level,points,created_at,updated_at,
         is_deleted
     </sql>

@@ -20,6 +20,6 @@ public class SaTokenConfigure implements WebMvcConfigurer {
         registry.addInterceptor(new SaInterceptor(handler -> {
 //            排除所有的预检请求
             SaRouter.notMatch(SaHttpMethod.OPTIONS).check(r -> StpUtil.checkLogin());
-        })).addPathPatterns("/**").excludePathPatterns("/api/v1/user/login", "/api/v1/user/register", "/swagger-ui/**", "/v3/api-docs");
+        })).addPathPatterns("/**").excludePathPatterns("/api/v1/user/login", "/api/v1/user/register", "/api/v1/customer/login", "/api/v1/customer/register", "/swagger-ui/**", "/v3/api-docs");
     }
 }

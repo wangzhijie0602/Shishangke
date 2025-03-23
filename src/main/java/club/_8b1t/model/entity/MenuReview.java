@@ -2,36 +2,37 @@ package club._8b1t.model.entity;
 
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.TableLogic;
 import com.baomidou.mybatisplus.annotation.TableName;
 import java.math.BigDecimal;
-import java.util.Date;
+import java.time.LocalDateTime;
 import lombok.Data;
 
 /**
- * 菜品评价表
+ * 菜品评价实体类
  * @TableName menu_review
  */
-@TableName(value ="menu_review")
 @Data
+@TableName("menu_review")
 public class MenuReview {
     /**
-     * 评价ID，主键，自增
+     * 评价ID
      */
     @TableId(type = IdType.AUTO)
     private Long reviewId;
 
     /**
-     * 评价用户ID（外键关联 user.id）
+     * 评价用户ID
      */
     private Long userId;
 
     /**
-     * 菜品ID（外键关联 menu.menu_id）
+     * 菜品ID
      */
     private Integer menuId;
 
     /**
-     * 关联订单ID（外键关联 order.order_id）
+     * 关联订单ID
      */
     private Long orderId;
 
@@ -73,15 +74,16 @@ public class MenuReview {
     /**
      * 评价创建时间
      */
-    private Date createdAt;
+    private LocalDateTime createdAt;
 
     /**
      * 最后更新时间
      */
-    private Date updatedAt;
+    private LocalDateTime updatedAt;
 
     /**
-     * 软删除标记
+     * 是否删除（0：未删除，1：已删除）
      */
+    @TableLogic
     private Integer isDeleted;
 }

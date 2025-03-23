@@ -108,23 +108,21 @@ CREATE TABLE `order` (
   COLLATE = utf8mb4_0900_ai_ci COMMENT='订单信息表';
 
 CREATE TABLE `customer` (
-    `customer_id`    BIGINT       NOT NULL AUTO_INCREMENT COMMENT '顾客ID，主键，自增',
-    `user_id`        BIGINT       NOT NULL COMMENT '关联的用户ID（外键关联 user.id）',
-    `real_name`      VARCHAR(50)  DEFAULT NULL COMMENT '真实姓名',
-    `gender`         VARCHAR(10)  DEFAULT NULL COMMENT '性别(MALE:男, FEMALE:女, OTHER:其他)',
-    `birth_date`     DATE         DEFAULT NULL COMMENT '出生日期',
-    `default_address` VARCHAR(255) DEFAULT NULL COMMENT '默认收货地址',
-    `preferences`    TEXT         DEFAULT NULL COMMENT '饮食偏好（JSON格式）',
-    `vip_level`      INT          NOT NULL DEFAULT 0 COMMENT 'VIP等级',
-    `points`         INT          NOT NULL DEFAULT 0 COMMENT '积分',
-    `created_at`     TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-    `updated_at`     TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
-    `is_deleted`     TINYINT(1)   NOT NULL DEFAULT 0 COMMENT '软删除标记',
-    PRIMARY KEY (`customer_id`),
-    UNIQUE KEY `idx_user_id` (`user_id`)
-) ENGINE = InnoDB
-  DEFAULT CHARSET = utf8mb4
-  COLLATE = utf8mb4_0900_ai_ci COMMENT='顾客信息表';
+                            `id` bigint NOT NULL COMMENT '顾客ID，主键，自增',
+                            `username` varchar(50) NOT NULL,
+                            `password` varchar(255) NOT NULL,
+                            `nickname` varchar(50) NOT NULL COMMENT '昵称',
+                            `gender` varchar(10) NOT NULL DEFAULT 'OTHER' COMMENT '性别(MALE:男, FEMALE:女, OTHER:其他)',
+                            `birth_date` date DEFAULT NULL COMMENT '出生日期',
+                            `default_address` varchar(255) DEFAULT NULL COMMENT '默认收货地址',
+                            `preferences` text COMMENT '饮食偏好（JSON格式）',
+                            `vip_level` int NOT NULL DEFAULT '0' COMMENT 'VIP等级',
+                            `points` int NOT NULL DEFAULT '0' COMMENT '积分',
+                            `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+                            `updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+                            `is_deleted` tinyint(1) NOT NULL DEFAULT '0' COMMENT '软删除标记',
+                            PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='顾客信息表'
 
 CREATE TABLE `menu_review` (
     `review_id`      BIGINT        NOT NULL AUTO_INCREMENT COMMENT '评价ID，主键，自增',
@@ -148,5 +146,22 @@ CREATE TABLE `menu_review` (
 ) ENGINE = InnoDB
   DEFAULT CHARSET = utf8mb4
   COLLATE = utf8mb4_0900_ai_ci COMMENT='菜品评价表';
+
+
+CREATE TABLE `customer_address` (
+                                    `id` bigint NOT NULL primary key AUTO_INCREMENT COMMENT '地址ID，主键，自增',
+                                    `customer_id` bigint NOT NULL unique COMMENT '用户ID（外键关联 customer_id）',
+                                    `receiver_name` varchar(50) NOT NULL COMMENT '收货人姓名',
+                                    `phone` varchar(20) NOT NULL COMMENT '联系电话',
+                                    `province` varchar(50) NOT NULL COMMENT '省份',
+                                    `city` varchar(50) NOT NULL COMMENT '城市',
+                                    `district` varchar(50) NOT NULL COMMENT '区/县',
+                                    `detail_address` varchar(255) NOT NULL COMMENT '详细地址',
+                                    `tag` varchar(20) DEFAULT NULL COMMENT '地址标签（如家、公司、学校等）',
+                                    `is_default` tinyint(1) NOT NULL DEFAULT '0' COMMENT '是否默认地址（0:否，1:是）',
+                                    `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+                                    `updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+                                    `is_deleted` tinyint(1) NOT NULL DEFAULT '0' COMMENT '软删除标记'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='用户外卖地址表';
 
 
