@@ -2,7 +2,7 @@ package club._8b1t.controller;
 
 import club._8b1t.common.Result;
 import club._8b1t.exception.BusinessException;
-import club._8b1t.exception.ErrorCode;
+import club._8b1t.exception.ResultCode;
 import club._8b1t.model.dto.menu.MenuCreateRequest;
 import club._8b1t.model.dto.menu.MenuQueryRequest;
 import club._8b1t.model.dto.menu.MenuUpdateRequest;
@@ -89,7 +89,7 @@ public class MenuController {
         boolean saved = menuService.save(menu);
         // 如果保存失败，抛出系统异常
         if (!saved) {
-            throw new BusinessException(ErrorCode.SYSTEM_ERROR);
+            throw new BusinessException(ResultCode.INTERNAL_SERVER_ERROR);
         }
         // 返回创建成功的响应
         return ResultUtil.success("创建成功", menu.getMenuId());
@@ -106,7 +106,7 @@ public class MenuController {
         // 检查菜单是否存在
         Menu existMenu = menuService.getById(request.getMenuId());
         if (existMenu == null) {
-            throw new BusinessException(ErrorCode.NOT_FOUND_ERROR, "菜单项不存在");
+            throw new BusinessException(ResultCode.NOT_FOUND, "菜单项不存在");
         }
 
         // 将请求参数转换为菜单对象
@@ -115,7 +115,7 @@ public class MenuController {
         boolean updated = menuService.updateById(menu);
         // 如果更新失败，抛出系统异常
         if (!updated) {
-            throw new BusinessException(ErrorCode.SYSTEM_ERROR);
+            throw new BusinessException(ResultCode.INTERNAL_SERVER_ERROR);
         }
         // 返回更新成功的响应
         return ResultUtil.success("更新成功");
@@ -132,14 +132,14 @@ public class MenuController {
         // 检查菜单是否存在
         Menu existMenu = menuService.getById(id);
         if (existMenu == null) {
-            throw new BusinessException(ErrorCode.NOT_FOUND_ERROR, "菜单项不存在");
+            throw new BusinessException(ResultCode.NOT_FOUND, "菜单项不存在");
         }
 
         // 删除菜单信息
         boolean deleted = menuService.removeById(id);
         // 如果删除失败，抛出系统异常
         if (!deleted) {
-            throw new BusinessException(ErrorCode.SYSTEM_ERROR);
+            throw new BusinessException(ResultCode.INTERNAL_SERVER_ERROR);
         }
         // 返回删除成功的响应
         return ResultUtil.success("删除成功");
@@ -156,7 +156,7 @@ public class MenuController {
         // 获取菜单信息
         Menu menu = menuService.getById(id);
         if (menu == null) {
-            throw new BusinessException(ErrorCode.NOT_FOUND_ERROR, "菜单项不存在");
+            throw new BusinessException(ResultCode.NOT_FOUND, "菜单项不存在");
         }
 
         // 转换为视图对象并返回
@@ -214,7 +214,7 @@ public class MenuController {
     @PostMapping("/upload/image")
     public Result<String> uploadImage(@RequestParam("file") MultipartFile file) {
         if (file == null || file.isEmpty()) {
-            throw new BusinessException(ErrorCode.PARAMS_ERROR, "请选择要上传的图片");
+            throw new BusinessException(ResultCode.BAD_REQUEST, "请选择要上传的图片");
         }
         Long userId = StpUtil.getLoginIdAsLong();
         String imageUrl = cosService.uploadDishImage(userId, file);

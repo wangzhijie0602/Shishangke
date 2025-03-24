@@ -1,5 +1,6 @@
 package club._8b1t.model.entity;
 
+import club._8b1t.model.enums.MerchantStatusEnum;
 import club._8b1t.model.vo.MerchantVO;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
@@ -90,7 +91,7 @@ public class Merchant {
     /**
      * 商家状态
      */
-    private String status;
+    private MerchantStatusEnum status;
 
     /**
      * 创建时间

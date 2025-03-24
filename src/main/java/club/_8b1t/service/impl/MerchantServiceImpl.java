@@ -6,6 +6,7 @@ import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import club._8b1t.model.entity.Merchant;
+import club._8b1t.model.enums.MerchantStatusEnum;
 import club._8b1t.service.MerchantService;
 import club._8b1t.mapper.MerchantMapper;
 import org.springframework.stereotype.Service;
@@ -20,16 +21,6 @@ import java.math.BigDecimal;
 @Service
 public class MerchantServiceImpl extends ServiceImpl<MerchantMapper, Merchant>
     implements MerchantService{
-
-    @Override
-    public Merchant getMerchantByIdAndUserId(Long merchantId, Long userId) {
-        // 查询指定ID的商家是否属于当前用户
-        LambdaQueryWrapper<Merchant> queryWrapper = new LambdaQueryWrapper<Merchant>()
-                .eq(Merchant::getId, merchantId)
-                .eq(Merchant::getUserId, userId);
-        
-        return this.getOne(queryWrapper);
-    }
 
     @Override
     public Page<Merchant> getMerchantPage(Integer pageNumber, Integer pageSize) {
@@ -113,7 +104,7 @@ public class MerchantServiceImpl extends ServiceImpl<MerchantMapper, Merchant>
     }
 
     @Override
-    public boolean updateStatus(Long merchantId, String status) {
+    public boolean updateStatus(Long merchantId, MerchantStatusEnum status) {
         LambdaUpdateWrapper<Merchant> updateWrapper = new LambdaUpdateWrapper<Merchant>()
                 .eq(Merchant::getId, merchantId)
                 .set(Merchant::getStatus, status);

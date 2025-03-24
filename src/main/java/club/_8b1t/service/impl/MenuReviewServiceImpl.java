@@ -1,7 +1,7 @@
 package club._8b1t.service.impl;
 
 import club._8b1t.exception.BusinessException;
-import club._8b1t.exception.ErrorCode;
+import club._8b1t.exception.ResultCode;
 import club._8b1t.model.entity.MenuReview;
 import club._8b1t.mapper.MenuReviewMapper;
 import club._8b1t.service.MenuReviewService;
@@ -43,7 +43,7 @@ public class MenuReviewServiceImpl extends ServiceImpl<MenuReviewMapper, MenuRev
         // 保存评价
         boolean saved = save(menuReview);
         if (!saved) {
-            throw new BusinessException(ErrorCode.SYSTEM_ERROR, "创建评价失败");
+            throw new BusinessException(ResultCode.INTERNAL_SERVER_ERROR, "创建评价失败");
         }
         
         return menuReview.getReviewId();
@@ -61,7 +61,7 @@ public class MenuReviewServiceImpl extends ServiceImpl<MenuReviewMapper, MenuRev
         // 获取原评价信息
         MenuReview existingReview = getById(menuReview.getReviewId());
         if (existingReview == null) {
-            throw new BusinessException(ErrorCode.NOT_FOUND_ERROR, "评价不存在");
+            throw new BusinessException(ResultCode.NOT_FOUND, "评价不存在");
         }
         
         // 保留原点赞数量
@@ -147,7 +147,7 @@ public class MenuReviewServiceImpl extends ServiceImpl<MenuReviewMapper, MenuRev
     public int likeReview(Long reviewId) {
         MenuReview review = getById(reviewId);
         if (review == null) {
-            throw new BusinessException(ErrorCode.NOT_FOUND_ERROR, "评价不存在");
+            throw new BusinessException(ResultCode.NOT_FOUND, "评价不存在");
         }
         
         // 增加点赞数量
@@ -159,7 +159,7 @@ public class MenuReviewServiceImpl extends ServiceImpl<MenuReviewMapper, MenuRev
                     
         boolean updated = update(updateWrapper);
         if (!updated) {
-            throw new BusinessException(ErrorCode.SYSTEM_ERROR, "点赞失败");
+            throw new BusinessException(ResultCode.INTERNAL_SERVER_ERROR, "点赞失败");
         }
         
         return newLikesCount;

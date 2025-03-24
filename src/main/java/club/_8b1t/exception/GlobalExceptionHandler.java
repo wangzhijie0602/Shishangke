@@ -16,10 +16,9 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 @Slf4j
 public class GlobalExceptionHandler {
 
-
     @ExceptionHandler(NotLoginException.class)
     public Result<String> handleNotLoginException(NotLoginException nle) {
-        return ResultUtil.error(40100, "用户未登录", nle.getMessage());
+        return ResultUtil.error(ResultCode.NOT_LOGIN.getCode(), "用户未登录", nle.getMessage());
     }
 
     @ExceptionHandler(BusinessException.class)
@@ -37,6 +36,6 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(Exception.class)
     public Result<String> handleException(Exception e) {
         log.error(e.getMessage(), e);
-        return ResultUtil.error(e.getMessage());
+        return ResultUtil.error(ResultCode.INTERNAL_SERVER_ERROR.getCode(), "系统内部错误", e.getMessage());
     }
 }

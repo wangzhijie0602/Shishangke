@@ -2,7 +2,7 @@ package club._8b1t.service.impl;
 
 import club._8b1t.config.CosClientConfig;
 import club._8b1t.exception.BusinessException;
-import club._8b1t.exception.ErrorCode;
+import club._8b1t.exception.ResultCode;
 import club._8b1t.mapper.CosMapper;
 import club._8b1t.service.CosService;
 import cn.hutool.core.date.DateUtil;
@@ -44,19 +44,19 @@ public class CosServiceImpl implements CosService {
     @Override
     public String uploadImage(MultipartFile multipartFile, String directory) {
         if (multipartFile.isEmpty()) {
-            throw new BusinessException(ErrorCode.PARAMS_ERROR, "文件不能为空");
+            throw new BusinessException(ResultCode.BAD_REQUEST, "文件不能为空");
         }
 
         // 1. 校验文件大小
         long fileSize = multipartFile.getSize();
         if (fileSize > MAX_FILE_SIZE) {
-            throw new BusinessException(ErrorCode.PARAMS_ERROR, "文件大小不能超过 2MB");
+            throw new BusinessException(ResultCode.BAD_REQUEST, "文件大小不能超过 2MB");
         }
 
         // 2. 校验文件后缀
         String fileSuffix = FileUtil.getSuffix(multipartFile.getOriginalFilename());
         if (!ALLOW_FORMAT_LIST.contains(fileSuffix)) {
-            throw new BusinessException(ErrorCode.PARAMS_ERROR, "文件类型错误，仅支持：" + String.join(", ", ALLOW_FORMAT_LIST));
+            throw new BusinessException(ResultCode.BAD_REQUEST, "文件类型错误，仅支持：" + String.join(", ", ALLOW_FORMAT_LIST));
         }
 
         // 3. 生成文件路径
@@ -78,7 +78,7 @@ public class CosServiceImpl implements CosService {
 
         } catch (Exception e) {
             log.error("图片上传到对象存储失败", e);
-            throw new BusinessException(ErrorCode.SYSTEM_ERROR, "上传失败");
+            throw new BusinessException(ResultCode.INTERNAL_SERVER_ERROR, "上传失败");
         } finally {
             // 7. 清理临时文件
             if (file != null && !file.delete()) {

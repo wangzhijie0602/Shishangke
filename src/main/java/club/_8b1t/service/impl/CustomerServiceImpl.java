@@ -1,6 +1,5 @@
 package club._8b1t.service.impl;
 
-import club._8b1t.model.entity.User;
 import club._8b1t.service.CosService;
 import cn.dev33.satoken.secure.BCrypt;
 import cn.hutool.core.util.RandomUtil;
@@ -12,7 +11,7 @@ import club._8b1t.mapper.CustomerMapper;
 import jakarta.annotation.Resource;
 import org.springframework.stereotype.Service;
 import club._8b1t.exception.BusinessException;
-import club._8b1t.exception.ErrorCode;
+import club._8b1t.exception.ResultCode;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import org.springframework.transaction.annotation.Transactional;
@@ -42,7 +41,7 @@ public class CustomerServiceImpl extends ServiceImpl<CustomerMapper, Customer>
         Customer customer = getCustomerByUsername(username);
 
         if (customer == null || !BCrypt.checkpw(password, customer.getPassword())) {
-            throw new BusinessException(ErrorCode.PARAMS_ERROR, "用户名或密码错误");
+            throw new BusinessException(ResultCode.BAD_REQUEST, "用户名或密码错误");
         }
 
         return customer;
@@ -59,7 +58,7 @@ public class CustomerServiceImpl extends ServiceImpl<CustomerMapper, Customer>
     public Customer getCustomerByUsername(String username) {
 
         if (StrUtil.isBlank(username)) {
-            throw new BusinessException(ErrorCode.PARAMS_ERROR, "用户名不能为空");
+            throw new BusinessException(ResultCode.BAD_REQUEST, "用户名不能为空");
         }
 
         return this.getOne(new LambdaQueryWrapper<>(Customer.class)
@@ -78,7 +77,7 @@ public class CustomerServiceImpl extends ServiceImpl<CustomerMapper, Customer>
         // 检查用户名是否已存在
         Customer existingCustomer = getCustomerByUsername(customer.getUsername());
         if (existingCustomer != null) {
-            throw new BusinessException(ErrorCode.PARAMS_ERROR, "用户名已存在");
+            throw new BusinessException(ResultCode.BAD_REQUEST, "用户名已存在");
         }
 
         // 初始化VIP等级和积分
@@ -100,7 +99,7 @@ public class CustomerServiceImpl extends ServiceImpl<CustomerMapper, Customer>
             try {
                 customer.setBirthDate(LocalDate.parse(birthDateStr));
             } catch (DateTimeParseException e) {
-                throw new BusinessException(ErrorCode.PARAMS_ERROR, "出生日期格式无效");
+                throw new BusinessException(ResultCode.BAD_REQUEST, "出生日期格式无效");
             }
         }
 
@@ -113,7 +112,7 @@ public class CustomerServiceImpl extends ServiceImpl<CustomerMapper, Customer>
         // 保存顾客信息
         boolean saved = save(customer);
         if (!saved) {
-            throw new BusinessException(ErrorCode.SYSTEM_ERROR, "创建顾客信息失败");
+            throw new BusinessException(ResultCode.INTERNAL_SERVER_ERROR, "创建顾客信息失败");
         }
 
         return customer.getId();
@@ -131,7 +130,7 @@ public class CustomerServiceImpl extends ServiceImpl<CustomerMapper, Customer>
         // 检查顾客是否存在
         Customer existingCustomer = getById(customer.getId());
         if (existingCustomer == null) {
-            throw new BusinessException(ErrorCode.NOT_FOUND_ERROR, "顾客信息不存在");
+            throw new BusinessException(ResultCode.NOT_FOUND, "顾客信息不存在");
         }
 
         // 如果更新了密码，需要加密
@@ -174,7 +173,7 @@ public class CustomerServiceImpl extends ServiceImpl<CustomerMapper, Customer>
     public boolean updateGender(Long customerId, String gender) {
         // 验证性别值
         if (!isValidGender(gender)) {
-            throw new BusinessException(ErrorCode.PARAMS_ERROR, "无效的性别值");
+            throw new BusinessException(ResultCode.BAD_REQUEST, "无效的性别值");
         }
 
         LambdaUpdateWrapper<Customer> updateWrapper = new LambdaUpdateWrapper<>();
@@ -198,7 +197,7 @@ public class CustomerServiceImpl extends ServiceImpl<CustomerMapper, Customer>
         try {
             birthDateObj = LocalDate.parse(birthDate, DateTimeFormatter.ISO_LOCAL_DATE);
         } catch (DateTimeParseException e) {
-            throw new BusinessException(ErrorCode.PARAMS_ERROR, "出生日期格式无效");
+            throw new BusinessException(ResultCode.BAD_REQUEST, "出生日期格式无效");
         }
 
         LambdaUpdateWrapper<Customer> updateWrapper = new LambdaUpdateWrapper<>();
@@ -235,7 +234,7 @@ public class CustomerServiceImpl extends ServiceImpl<CustomerMapper, Customer>
     public String updateAvatar(Long customerId, MultipartFile file) {
         // 验证用户是否存在
         if (this.getById(customerId) == null) {
-            throw new BusinessException(ErrorCode.PARAMS_ERROR, "用户不存在");
+            throw new BusinessException(ResultCode.BAD_REQUEST, "用户不存在");
         }
 
         // 上传头像
@@ -249,7 +248,7 @@ public class CustomerServiceImpl extends ServiceImpl<CustomerMapper, Customer>
         boolean success = this.update(updateWrapper);
 
         if (!success) {
-            throw new BusinessException(ErrorCode.SYSTEM_ERROR, "更新头像失败");
+            throw new BusinessException(ResultCode.INTERNAL_SERVER_ERROR, "更新头像失败");
         }
 
         return avatarUrl;
@@ -277,12 +276,12 @@ public class CustomerServiceImpl extends ServiceImpl<CustomerMapper, Customer>
     @Override
     public boolean addPoints(Long customerId, Integer points) {
         if (points <= 0) {
-            throw new BusinessException(ErrorCode.PARAMS_ERROR, "增加的积分必须大于0");
+            throw new BusinessException(ResultCode.BAD_REQUEST, "增加的积分必须大于0");
         }
 
         Customer customer = getById(customerId);
         if (customer == null) {
-            throw new BusinessException(ErrorCode.NOT_FOUND_ERROR, "顾客信息不存在");
+            throw new BusinessException(ResultCode.NOT_FOUND, "顾客信息不存在");
         }
 
         int newPoints = customer.getPoints() + points;
@@ -305,17 +304,17 @@ public class CustomerServiceImpl extends ServiceImpl<CustomerMapper, Customer>
     @Override
     public boolean usePoints(Long customerId, Integer points) {
         if (points <= 0) {
-            throw new BusinessException(ErrorCode.PARAMS_ERROR, "使用的积分必须大于0");
+            throw new BusinessException(ResultCode.BAD_REQUEST, "使用的积分必须大于0");
         }
 
         Customer customer = getById(customerId);
         if (customer == null) {
-            throw new BusinessException(ErrorCode.NOT_FOUND_ERROR, "顾客信息不存在");
+            throw new BusinessException(ResultCode.NOT_FOUND, "顾客信息不存在");
         }
 
         // 检查积分是否足够
         if (customer.getPoints() < points) {
-            throw new BusinessException(ErrorCode.OPERATION_ERROR, "积分不足");
+            throw new BusinessException(ResultCode.INTERNAL_SERVER_ERROR, "积分不足");
         }
 
         int newPoints = customer.getPoints() - points;
@@ -338,17 +337,17 @@ public class CustomerServiceImpl extends ServiceImpl<CustomerMapper, Customer>
     @Override
     public boolean upgradeVipLevel(Long customerId, Integer vipLevel) {
         if (vipLevel < 0) {
-            throw new BusinessException(ErrorCode.PARAMS_ERROR, "VIP等级必须大于等于0");
+            throw new BusinessException(ResultCode.BAD_REQUEST, "VIP等级必须大于等于0");
         }
 
         Customer customer = getById(customerId);
         if (customer == null) {
-            throw new BusinessException(ErrorCode.NOT_FOUND_ERROR, "顾客信息不存在");
+            throw new BusinessException(ResultCode.NOT_FOUND, "顾客信息不存在");
         }
 
         // 检查是否为升级（不允许降级）
         if (customer.getVipLevel() > vipLevel) {
-            throw new BusinessException(ErrorCode.OPERATION_ERROR, "不能降级VIP等级");
+            throw new BusinessException(ResultCode.INTERNAL_SERVER_ERROR, "不能降级VIP等级");
         }
 
         LambdaUpdateWrapper<Customer> updateWrapper = new LambdaUpdateWrapper<>();

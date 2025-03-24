@@ -1,7 +1,7 @@
 package club._8b1t.service.impl;
 
 import club._8b1t.exception.BusinessException;
-import club._8b1t.exception.ErrorCode;
+import club._8b1t.exception.ResultCode;
 import club._8b1t.model.entity.Order;
 import club._8b1t.mapper.OrderMapper;
 import club._8b1t.service.OrderService;
@@ -37,7 +37,7 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
         // 保存订单
         boolean saved = save(order);
         if (!saved) {
-            throw new BusinessException(ErrorCode.SYSTEM_ERROR, "创建订单失败");
+            throw new BusinessException(ResultCode.INTERNAL_SERVER_ERROR, "创建订单失败");
         }
         
         return order.getOrderId();
@@ -72,7 +72,7 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
     public boolean updateOrderStatus(Long id, String status) {
         // 验证状态值
         if (!isValidStatus(status)) {
-            throw new BusinessException(ErrorCode.PARAMS_ERROR, "无效的订单状态");
+            throw new BusinessException(ResultCode.BAD_REQUEST, "无效的订单状态");
         }
         
         Order order = getById(id);
@@ -134,7 +134,7 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
     public boolean payOrder(Long id, String paymentMethod) {
         // 验证支付方式
         if (!isValidPaymentMethod(paymentMethod)) {
-            throw new BusinessException(ErrorCode.PARAMS_ERROR, "无效的支付方式");
+            throw new BusinessException(ResultCode.BAD_REQUEST, "无效的支付方式");
         }
         
         Order order = getById(id);
@@ -144,7 +144,7 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
         
         // 如果订单已支付，则返回失败
         if ("PAID".equals(order.getPaymentStatus())) {
-            throw new BusinessException(ErrorCode.OPERATION_ERROR, "订单已支付，请勿重复支付");
+            throw new BusinessException(ResultCode.INTERNAL_SERVER_ERROR, "订单已支付，请勿重复支付");
         }
         
         // 设置支付方式和支付状态

@@ -1,7 +1,7 @@
 package club._8b1t.service.impl;
 
 import club._8b1t.exception.BusinessException;
-import club._8b1t.exception.ErrorCode;
+import club._8b1t.exception.ResultCode;
 import club._8b1t.model.entity.MerchantReview;
 import club._8b1t.mapper.MerchantReviewMapper;
 import club._8b1t.service.MerchantReviewService;
@@ -37,7 +37,7 @@ public class MerchantReviewServiceImpl extends ServiceImpl<MerchantReviewMapper,
         // 保存评价
         boolean saved = save(merchantReview);
         if (!saved) {
-            throw new BusinessException(ErrorCode.SYSTEM_ERROR, "创建评价失败");
+            throw new BusinessException(ResultCode.INTERNAL_SERVER_ERROR, "创建评价失败");
         }
         
         return merchantReview.getReviewId();
@@ -55,7 +55,7 @@ public class MerchantReviewServiceImpl extends ServiceImpl<MerchantReviewMapper,
         // 获取原评价信息
         MerchantReview existingReview = getById(merchantReview.getReviewId());
         if (existingReview == null) {
-            throw new BusinessException(ErrorCode.NOT_FOUND_ERROR, "评价不存在");
+            throw new BusinessException(ResultCode.NOT_FOUND, "评价不存在");
         }
         
         // 更新评价信息

@@ -1,6 +1,7 @@
 package club._8b1t.service;
 
 import club._8b1t.model.entity.Merchant;
+import club._8b1t.model.enums.MerchantStatusEnum;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
 
@@ -10,15 +11,6 @@ import com.baomidou.mybatisplus.extension.service.IService;
 * @createDate 2025-03-07 21:08:39
 */
 public interface MerchantService extends IService<Merchant> {
-
-    /**
-     * 根据商家ID和用户ID查询商家
-     * 
-     * @param merchantId 商家ID
-     * @param userId 用户ID
-     * @return 如果商家存在且属于该用户，返回商家对象；否则返回null
-     */
-    Merchant getMerchantByIdAndUserId(Long merchantId, Long userId);
 
     Page<Merchant> getMerchantPage(Integer pageNumber, Integer pageSize);
     
@@ -106,5 +98,5 @@ public interface MerchantService extends IService<Merchant> {
      * @param status 新的状态
      * @return 是否更新成功
      */
-    boolean updateStatus(Long merchantId, String status);
+    boolean updateStatus(Long merchantId, MerchantStatusEnum status);
 }

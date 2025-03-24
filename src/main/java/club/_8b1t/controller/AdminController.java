@@ -2,7 +2,7 @@ package club._8b1t.controller;
 
 import club._8b1t.common.Result;
 import club._8b1t.exception.BusinessException;
-import club._8b1t.exception.ErrorCode;
+import club._8b1t.exception.ResultCode;
 import club._8b1t.model.dto.merchant.MerchantQueryRequest;
 import club._8b1t.model.dto.merchant.MerchantUpdateRequest;
 import club._8b1t.model.dto.user.UserCreateRequest;
@@ -10,6 +10,7 @@ import club._8b1t.model.dto.user.UserQueryRequest;
 import club._8b1t.model.dto.user.UserUpdateRequest;
 import club._8b1t.model.entity.Merchant;
 import club._8b1t.model.entity.User;
+import club._8b1t.model.enums.MerchantStatusEnum;
 import club._8b1t.model.vo.MerchantVO;
 import club._8b1t.model.vo.UserVO;
 import club._8b1t.service.MerchantService;
@@ -26,9 +27,6 @@ import org.springframework.web.bind.annotation.*;
 
 import java.math.BigDecimal;
 
-@RestController
-@RequestMapping("/api/v1/admin")
-@SaCheckRole("ADMIN")
 public class AdminController {
 
     @Resource
@@ -39,131 +37,6 @@ public class AdminController {
 
     @Resource
     private Converter converter;
-
-    @PostMapping("/user")
-    public Result<Long> create(@RequestBody @Valid UserCreateRequest request) {
-        // 创建用户
-        Long userId = userService.createUser(
-                request.getUsername(), 
-                request.getPassword(),
-                request.getNickname(),
-                request.getEmail(),
-                request.getPhone(),
-                "USER" // 默认为普通用户角色
-        );
-        
-        return ResultUtil.success("创建成功", userId);
-    }
-
-    @GetMapping("/user/{id}")
-    public Result<UserVO> get(@PathVariable String id) {
-        // 将字符串ID转换为Long
-        Long userId = Long.valueOf(id);
-        
-        // 获取用户信息
-        User user = userService.getUser(userId);
-        
-        // 转换为VO
-        UserVO userVO = converter.convert(user, UserVO.class);
-        
-        return ResultUtil.success(userVO);
-    }
-
-    @PostMapping("/user/update")
-    public Result<Void> update(@RequestBody @Valid UserUpdateRequest updateRequest) {
-        // 创建User对象
-        User user = converter.convert(updateRequest, User.class);
-        
-        // 更新用户信息
-        boolean success = userService.updateUserInfo(user);
-        
-        if (!success) {
-            throw new BusinessException(ErrorCode.SYSTEM_ERROR, "更新失败");
-        }
-        
-        return ResultUtil.success("更新成功");
-    }
-
-    @GetMapping("/user/{id}/delete")
-    public Result<Void> delete(@PathVariable String id) {
-        boolean success = userService.removeById(id);
-        if (!success) {
-            throw new BusinessException(ErrorCode.SYSTEM_ERROR, "删除失败");
-        }
-        return ResultUtil.success("删除成功");
-    }
-
-    /**
-     * 获取用户的角色
-     * @param id 用户ID
-     * @return 用户的角色
-     */
-    @GetMapping("/user/{id}/role")
-    public Result<String> getRole(@PathVariable String id) {
-        // 将字符串ID转换为Long
-        Long userId = Long.valueOf(id);
-        
-        // 获取用户信息
-        User user = userService.getUser(userId);
-        
-        // 如果用户没有角色，则抛出异常
-        if (StrUtil.isBlank(user.getRole())) {
-            throw new BusinessException(ErrorCode.SYSTEM_ERROR, "用户没有角色");
-        }
-        
-        // 返回角色
-        return ResultUtil.success("获取角色成功", user.getRole());
-    }
-
-    @GetMapping("/user/{id}/ban")
-    public Result<Void> ban(@PathVariable String id) {
-        // 将字符串ID转换为Long
-        Long userId = Long.valueOf(id);
-        
-        // 禁用用户
-        boolean success = userService.updateStatus(userId, "DISABLED");
-        
-        if (!success) {
-            throw new BusinessException(ErrorCode.SYSTEM_ERROR, "禁用失败");
-        }
-        
-        return ResultUtil.success("禁用成功");
-    }
-
-    @GetMapping("/user/{id}/unban")
-    public Result<Void> unban(@PathVariable String id) {
-        // 将字符串ID转换为Long
-        Long userId = Long.valueOf(id);
-        
-        // 解封用户
-        boolean success = userService.updateStatus(userId, "ENABLED");
-        
-        if (!success) {
-            throw new BusinessException(ErrorCode.SYSTEM_ERROR, "解封失败");
-        }
-        
-        return ResultUtil.success("解封成功");
-    }
-
-    @PostMapping("/user/list")
-    public Result<Page<UserVO>> getUserList(@RequestParam(defaultValue = "1") Integer pageNum,
-                                            @RequestParam(defaultValue = "10") Integer pageSize,
-                                            @RequestBody(required = false) UserQueryRequest request) {
-        // 构建查询参数
-        String username = request != null ? request.getUsername() : null;
-        String nickname = request != null ? request.getNickname() : null;
-        String phone = request != null ? request.getPhone() : null;
-        String status = request != null ? request.getStatus() : null;
-        
-        // 查询用户列表
-        Page<User> userPage = userService.listUsers(pageNum, pageSize, username, nickname, phone, status);
-        
-        // 将Page<User>转换为Page<UserVO>
-        Page<UserVO> userVOPage = new Page<>(userPage.getCurrent(), userPage.getSize(), userPage.getTotal());
-        userVOPage.setRecords(converter.convert(userPage.getRecords(), UserVO.class));
-        
-        return ResultUtil.success(userVOPage);
-    }
 
     /**
      * 管理员查询商家列表
@@ -201,7 +74,7 @@ public class AdminController {
     public Result<MerchantVO> getMerchant(@PathVariable Long id) {
         Merchant merchant = merchantService.getById(id);
         if (merchant == null) {
-            throw new BusinessException(ErrorCode.NOT_FOUND_ERROR, "商家不存在");
+            throw new BusinessException(ResultCode.NOT_FOUND, "商家不存在");
         }
         
         return ResultUtil.success(converter.convert(merchant, MerchantVO.class));
@@ -215,7 +88,7 @@ public class AdminController {
         // 验证商家是否存在
         Merchant merchant = merchantService.getById(request.getId());
         if (merchant == null) {
-            throw new BusinessException(ErrorCode.NOT_FOUND_ERROR, "商家不存在");
+            throw new BusinessException(ResultCode.NOT_FOUND, "商家不存在");
         }
         
         // 将请求参数转换为商家对象
@@ -226,7 +99,7 @@ public class AdminController {
         
         // 如果更新失败，抛出系统异常
         if (!updated) {
-            throw new BusinessException(ErrorCode.SYSTEM_ERROR, "更新失败");
+            throw new BusinessException(ResultCode.INTERNAL_SERVER_ERROR, "更新失败");
         }
         
         return ResultUtil.success("更新成功");
@@ -240,13 +113,13 @@ public class AdminController {
         // 先确认商家是否存在
         Merchant merchant = merchantService.getById(id);
         if (merchant == null) {
-            throw new BusinessException(ErrorCode.NOT_FOUND_ERROR, "商家不存在");
+            throw new BusinessException(ResultCode.NOT_FOUND, "商家不存在");
         }
         
         boolean updated = merchantService.updateName(id, name);
         
         if (!updated) {
-            throw new BusinessException(ErrorCode.SYSTEM_ERROR, "更新失败");
+            throw new BusinessException(ResultCode.INTERNAL_SERVER_ERROR, "更新失败");
         }
         
         return ResultUtil.success("名称更新成功");
@@ -260,13 +133,13 @@ public class AdminController {
         // 先确认商家是否存在
         Merchant merchant = merchantService.getById(id);
         if (merchant == null) {
-            throw new BusinessException(ErrorCode.NOT_FOUND_ERROR, "商家不存在");
+            throw new BusinessException(ResultCode.NOT_FOUND, "商家不存在");
         }
         
         boolean updated = merchantService.updateLogo(id, logo);
         
         if (!updated) {
-            throw new BusinessException(ErrorCode.SYSTEM_ERROR, "更新失败");
+            throw new BusinessException(ResultCode.INTERNAL_SERVER_ERROR, "更新失败");
         }
         
         return ResultUtil.success("Logo更新成功");
@@ -280,13 +153,13 @@ public class AdminController {
         // 先确认商家是否存在
         Merchant merchant = merchantService.getById(id);
         if (merchant == null) {
-            throw new BusinessException(ErrorCode.NOT_FOUND_ERROR, "商家不存在");
+            throw new BusinessException(ResultCode.NOT_FOUND, "商家不存在");
         }
         
         boolean updated = merchantService.updatePhone(id, phone);
         
         if (!updated) {
-            throw new BusinessException(ErrorCode.SYSTEM_ERROR, "更新失败");
+            throw new BusinessException(ResultCode.INTERNAL_SERVER_ERROR, "更新失败");
         }
         
         return ResultUtil.success("联系电话更新成功");
@@ -305,13 +178,13 @@ public class AdminController {
         // 先确认商家是否存在
         Merchant merchant = merchantService.getById(id);
         if (merchant == null) {
-            throw new BusinessException(ErrorCode.NOT_FOUND_ERROR, "商家不存在");
+            throw new BusinessException(ResultCode.NOT_FOUND, "商家不存在");
         }
         
         boolean updated = merchantService.updateAddress(id, province, city, district, street, addressDetail);
         
         if (!updated) {
-            throw new BusinessException(ErrorCode.SYSTEM_ERROR, "更新失败");
+            throw new BusinessException(ResultCode.INTERNAL_SERVER_ERROR, "更新失败");
         }
         
         return ResultUtil.success("地址更新成功");
@@ -327,13 +200,13 @@ public class AdminController {
         // 先确认商家是否存在
         Merchant merchant = merchantService.getById(id);
         if (merchant == null) {
-            throw new BusinessException(ErrorCode.NOT_FOUND_ERROR, "商家不存在");
+            throw new BusinessException(ResultCode.NOT_FOUND, "商家不存在");
         }
         
         boolean updated = merchantService.updateBusinessHours(id, openTime, closeTime);
         
         if (!updated) {
-            throw new BusinessException(ErrorCode.SYSTEM_ERROR, "更新失败");
+            throw new BusinessException(ResultCode.INTERNAL_SERVER_ERROR, "更新失败");
         }
         
         return ResultUtil.success("营业时间更新成功");
@@ -347,13 +220,13 @@ public class AdminController {
         // 先确认商家是否存在
         Merchant merchant = merchantService.getById(id);
         if (merchant == null) {
-            throw new BusinessException(ErrorCode.NOT_FOUND_ERROR, "商家不存在");
+            throw new BusinessException(ResultCode.NOT_FOUND, "商家不存在");
         }
         
         boolean updated = merchantService.updateDescription(id, description);
         
         if (!updated) {
-            throw new BusinessException(ErrorCode.SYSTEM_ERROR, "更新失败");
+            throw new BusinessException(ResultCode.INTERNAL_SERVER_ERROR, "更新失败");
         }
         
         return ResultUtil.success("描述更新成功");
@@ -367,13 +240,13 @@ public class AdminController {
         // 先确认商家是否存在
         Merchant merchant = merchantService.getById(id);
         if (merchant == null) {
-            throw new BusinessException(ErrorCode.NOT_FOUND_ERROR, "商家不存在");
+            throw new BusinessException(ResultCode.NOT_FOUND, "商家不存在");
         }
         
         boolean updated = merchantService.updateMinPrice(id, minPrice);
         
         if (!updated) {
-            throw new BusinessException(ErrorCode.SYSTEM_ERROR, "更新失败");
+            throw new BusinessException(ResultCode.INTERNAL_SERVER_ERROR, "更新失败");
         }
         
         return ResultUtil.success("最低起送价更新成功");
@@ -387,13 +260,19 @@ public class AdminController {
         // 先确认商家是否存在
         Merchant merchant = merchantService.getById(id);
         if (merchant == null) {
-            throw new BusinessException(ErrorCode.NOT_FOUND_ERROR, "商家不存在");
+            throw new BusinessException(ResultCode.NOT_FOUND, "商家不存在");
         }
         
-        boolean updated = merchantService.updateStatus(id, status);
+        // 验证状态有效性
+        if (!MerchantStatusEnum.isValidCode(status)) {
+            throw new BusinessException(ResultCode.BAD_REQUEST, "无效的商家状态");
+        }
+        
+        MerchantStatusEnum statusEnum = MerchantStatusEnum.getByCode(status);
+        boolean updated = merchantService.updateStatus(id, statusEnum);
         
         if (!updated) {
-            throw new BusinessException(ErrorCode.SYSTEM_ERROR, "更新失败");
+            throw new BusinessException(ResultCode.INTERNAL_SERVER_ERROR, "更新失败");
         }
 
         return ResultUtil.success("状态更新成功");
@@ -406,12 +285,12 @@ public class AdminController {
     public Result<String> deleteMerchant(@PathVariable Long id) {
         Merchant merchant = merchantService.getById(id);
         if (merchant == null) {
-            throw new BusinessException(ErrorCode.NOT_FOUND_ERROR, "商家不存在");
+            throw new BusinessException(ResultCode.NOT_FOUND, "商家不存在");
         }
         
         boolean deleted = merchantService.removeById(id);
         if (!deleted) {
-            throw new BusinessException(ErrorCode.SYSTEM_ERROR, "删除失败");
+            throw new BusinessException(ResultCode.INTERNAL_SERVER_ERROR, "删除失败");
         }
         
         return ResultUtil.success("删除成功");

@@ -13,14 +13,7 @@ import java.util.Date;
 * @createDate 2025-03-06 19:59:26
 */
 public interface UserService extends IService<User> {
-    
-    /**
-     * 获取用户对象
-     * @param userId 用户ID
-     * @return 用户对象
-     */
-    User getUser(Long userId);
-    
+
     /**
      * 更新用户头像
      * @param userId 用户ID
@@ -37,7 +30,8 @@ public interface UserService extends IService<User> {
      * @return 是否成功
      */
     boolean updatePassword(Long userId, String oldPassword, String newPassword);
-    
+    boolean updatePassword(Long userId, String newPassword);
+
     /**
      * 更新用户昵称
      * @param userId 用户ID
@@ -71,41 +65,11 @@ public interface UserService extends IService<User> {
     boolean updateStatus(Long userId, String status);
     
     /**
-     * 更新用户最后登录时间
-     * @param userId 用户ID
-     * @param lastLoginTime 最后登录时间
-     * @return 是否成功
-     */
-    boolean updateLastLoginTime(Long userId, Date lastLoginTime);
-    
-    /**
      * 分页获取用户列表
+     * @param user 查询参数
      * @param pageNum 页码
      * @param pageSize 每页大小
-     * @param username 用户名(可选)
-     * @param nickname 昵称(可选)
-     * @param phone 手机号(可选)
-     * @param status 状态(可选)
      * @return 用户分页列表
      */
-    Page<User> listUsers(int pageNum, int pageSize, String username, String nickname, String phone, String status);
-    
-    /**
-     * 管理员创建用户
-     * @param username 用户名
-     * @param password 密码
-     * @param nickname 昵称
-     * @param email 邮箱
-     * @param phone 电话
-     * @param role 角色
-     * @return 用户ID
-     */
-    Long createUser(String username, String password, String nickname, String email, String phone, String role);
-    
-    /**
-     * 更新用户信息
-     * @param user 用户信息
-     * @return 是否成功
-     */
-    boolean updateUserInfo(User user);
+    Page<User> listUsers(User user, int pageNum, int pageSize);
 }

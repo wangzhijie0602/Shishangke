@@ -2,10 +2,9 @@ package club._8b1t.controller;
 
 import club._8b1t.common.Result;
 import club._8b1t.exception.BusinessException;
-import club._8b1t.exception.ErrorCode;
+import club._8b1t.exception.ResultCode;
 import club._8b1t.model.dto.customer.CustomerCreateRequest;
 import club._8b1t.model.dto.customer.CustomerLoginRequest;
-import club._8b1t.model.dto.customer.CustomerUpdateRequest;
 import club._8b1t.model.dto.customer.address.CustomerAddressCreateRequest;
 import club._8b1t.model.dto.customer.address.CustomerAddressUpdateRequest;
 import club._8b1t.model.entity.Customer;
@@ -59,7 +58,7 @@ public class CustomerController {
         // 检查用户名是否已存在
         Customer existingCustomer = customerService.getCustomerByUsername(request.getUsername());
         if (existingCustomer != null) {
-            throw new BusinessException(ErrorCode.PARAMS_ERROR, "用户名已存在");
+            throw new BusinessException(ResultCode.BAD_REQUEST, "用户名已存在");
         }
 
         // 将请求转换为顾客实体
@@ -80,7 +79,7 @@ public class CustomerController {
         // 登录验证
         Customer customer = customerService.getCustomerByUsernameAndPassword(request.getUsername(), request.getPassword());
         if (customer == null) {
-            throw new BusinessException(ErrorCode.PARAMS_ERROR, "用户名或密码错误");
+            throw new BusinessException(ResultCode.BAD_REQUEST, "用户名或密码错误");
         }
 
         // 使用Sa-Token登录，记录用户ID
@@ -114,7 +113,7 @@ public class CustomerController {
         // 获取用户信息
         Customer customer = customerService.getById(customerId);
         if (customer == null) {
-            throw new BusinessException(ErrorCode.NOT_FOUND_ERROR, "用户信息不存在");
+            throw new BusinessException(ResultCode.NOT_FOUND, "用户信息不存在");
         }
 
         // 转换为VO
@@ -135,13 +134,13 @@ public class CustomerController {
         // 检查顾客信息是否存在
         Customer existingCustomer = customerService.getById(customerId);
         if (existingCustomer == null) {
-            throw new BusinessException(ErrorCode.NOT_FOUND_ERROR, "顾客信息不存在");
+            throw new BusinessException(ResultCode.NOT_FOUND, "顾客信息不存在");
         }
 
         // 更新真实姓名
         boolean updated = customerService.updateNickname(customerId, nickname);
         if (!updated) {
-            throw new BusinessException(ErrorCode.SYSTEM_ERROR, "更新失败");
+            throw new BusinessException(ResultCode.INTERNAL_SERVER_ERROR, "更新失败");
         }
 
         return ResultUtil.success("更新成功");
@@ -159,18 +158,18 @@ public class CustomerController {
         // 检查顾客信息是否存在
         Customer existingCustomer = customerService.getById(customerId);
         if (existingCustomer == null) {
-            throw new BusinessException(ErrorCode.NOT_FOUND_ERROR, "顾客信息不存在");
+            throw new BusinessException(ResultCode.NOT_FOUND, "顾客信息不存在");
         }
 
         // 验证性别值
         if (!gender.equals("MALE") && !gender.equals("FEMALE") && !gender.equals("OTHER")) {
-            throw new BusinessException(ErrorCode.PARAMS_ERROR, "性别值无效");
+            throw new BusinessException(ResultCode.BAD_REQUEST, "性别值无效");
         }
 
         // 更新性别
         boolean updated = customerService.updateGender(customerId, gender);
         if (!updated) {
-            throw new BusinessException(ErrorCode.SYSTEM_ERROR, "更新失败");
+            throw new BusinessException(ResultCode.INTERNAL_SERVER_ERROR, "更新失败");
         }
 
         return ResultUtil.success("更新成功");
@@ -188,13 +187,13 @@ public class CustomerController {
         // 检查顾客信息是否存在
         Customer existingCustomer = customerService.getById(customerId);
         if (existingCustomer == null) {
-            throw new BusinessException(ErrorCode.NOT_FOUND_ERROR, "顾客信息不存在");
+            throw new BusinessException(ResultCode.NOT_FOUND, "顾客信息不存在");
         }
 
         // 更新出生日期
         boolean updated = customerService.updateBirthDate(customerId, birthDate);
         if (!updated) {
-            throw new BusinessException(ErrorCode.SYSTEM_ERROR, "更新失败");
+            throw new BusinessException(ResultCode.INTERNAL_SERVER_ERROR, "更新失败");
         }
 
         return ResultUtil.success("更新成功");
@@ -212,13 +211,13 @@ public class CustomerController {
         // 检查顾客信息是否存在
         Customer existingCustomer = customerService.getById(customerId);
         if (existingCustomer == null) {
-            throw new BusinessException(ErrorCode.NOT_FOUND_ERROR, "顾客信息不存在");
+            throw new BusinessException(ResultCode.NOT_FOUND, "顾客信息不存在");
         }
 
         // 更新饮食偏好
         boolean updated = customerService.updatePreferences(customerId, preferences);
         if (!updated) {
-            throw new BusinessException(ErrorCode.SYSTEM_ERROR, "更新失败");
+            throw new BusinessException(ResultCode.INTERNAL_SERVER_ERROR, "更新失败");
         }
 
         return ResultUtil.success("更新成功");
@@ -236,13 +235,13 @@ public class CustomerController {
         // 检查顾客信息是否存在
         Customer existingCustomer = customerService.getById(customerId);
         if (existingCustomer == null) {
-            throw new BusinessException(ErrorCode.NOT_FOUND_ERROR, "顾客信息不存在");
+            throw new BusinessException(ResultCode.NOT_FOUND, "顾客信息不存在");
         }
 
         // 上传头像并更新
         String avatarUrl = customerService.updateAvatar(customerId, file);
         if (avatarUrl == null) {
-            throw new BusinessException(ErrorCode.SYSTEM_ERROR, "头像上传失败");
+            throw new BusinessException(ResultCode.INTERNAL_SERVER_ERROR, "头像上传失败");
         }
 
         return ResultUtil.success("头像上传成功", avatarUrl);
@@ -268,7 +267,7 @@ public class CustomerController {
         Merchant merchant = merchantService.getById(merchantId);
 
         if (merchant == null) {
-            throw new BusinessException(ErrorCode.PARAMS_ERROR, "餐厅不存在");
+            throw new BusinessException(ResultCode.BAD_REQUEST, "餐厅不存在");
         }
 
         MerchantVO merchantVO = converter.convert(merchant, MerchantVO.class);
@@ -340,7 +339,7 @@ public class CustomerController {
         // 添加地址
         boolean added = customerAddressService.addAddress(address);
         if (!added) {
-            throw new BusinessException(ErrorCode.SYSTEM_ERROR, "添加地址失败");
+            throw new BusinessException(ResultCode.INTERNAL_SERVER_ERROR, "添加地址失败");
         }
         
         return ResultUtil.success("添加地址成功");
@@ -357,7 +356,7 @@ public class CustomerController {
         // 验证地址所有权
         CustomerAddress existingAddress = customerAddressService.getById(request.getId());
         if (existingAddress == null || !existingAddress.getCustomerId().equals(customerId)) {
-            throw new BusinessException(ErrorCode.PARAMS_ERROR, "地址不存在或无权修改");
+            throw new BusinessException(ResultCode.BAD_REQUEST, "地址不存在或无权修改");
         }
         
         // 将请求转换为实体
@@ -369,7 +368,7 @@ public class CustomerController {
         // 更新地址
         boolean updated = customerAddressService.updateAddress(address);
         if (!updated) {
-            throw new BusinessException(ErrorCode.SYSTEM_ERROR, "更新地址失败");
+            throw new BusinessException(ResultCode.INTERNAL_SERVER_ERROR, "更新地址失败");
         }
         
         return ResultUtil.success("更新地址成功");
@@ -386,13 +385,13 @@ public class CustomerController {
         // 验证地址所有权
         CustomerAddress existingAddress = customerAddressService.getById(addressId);
         if (existingAddress == null || !existingAddress.getCustomerId().equals(customerId)) {
-            throw new BusinessException(ErrorCode.PARAMS_ERROR, "地址不存在或无权修改");
+            throw new BusinessException(ResultCode.BAD_REQUEST, "地址不存在或无权修改");
         }
         
         // 设置默认地址
         boolean set = customerAddressService.setDefaultAddress(Long.parseLong(addressId), customerId);
         if (!set) {
-            throw new BusinessException(ErrorCode.SYSTEM_ERROR, "设置默认地址失败");
+            throw new BusinessException(ResultCode.INTERNAL_SERVER_ERROR, "设置默认地址失败");
         }
         
         return ResultUtil.success("设置默认地址成功");
@@ -409,12 +408,12 @@ public class CustomerController {
         // 验证地址所有权
         CustomerAddress existingAddress = customerAddressService.getById(addressId);
         if (existingAddress == null || !existingAddress.getCustomerId().equals(customerId)) {
-            throw new BusinessException(ErrorCode.PARAMS_ERROR, "地址不存在或无权删除");
+            throw new BusinessException(ResultCode.BAD_REQUEST, "地址不存在或无权删除");
         }
         
         boolean deleted = customerAddressService.removeById(existingAddress);
         if (!deleted) {
-            throw new BusinessException(ErrorCode.SYSTEM_ERROR, "删除地址失败");
+            throw new BusinessException(ResultCode.INTERNAL_SERVER_ERROR, "删除地址失败");
         }
         
         return ResultUtil.success("删除地址成功");
