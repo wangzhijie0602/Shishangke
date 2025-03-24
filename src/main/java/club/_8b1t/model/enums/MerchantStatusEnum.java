@@ -38,7 +38,7 @@ public enum MerchantStatusEnum {
      */
     public static MerchantStatusEnum getByCode(String code) {
         if (code == null) {
-            return null;
+            return null;/
         }
         
         for (MerchantStatusEnum status : MerchantStatusEnum.values()) {

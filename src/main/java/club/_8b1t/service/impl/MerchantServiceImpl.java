@@ -1,17 +1,21 @@
 package club._8b1t.service.impl;
 
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import club._8b1t.service.CosService;
+import club._8b1t.util.ExceptionUtil;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
-import com.baomidou.mybatisplus.core.toolkit.Wrappers;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import club._8b1t.model.entity.Merchant;
 import club._8b1t.model.enums.MerchantStatusEnum;
 import club._8b1t.service.MerchantService;
 import club._8b1t.mapper.MerchantMapper;
+import jakarta.annotation.Resource;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.math.BigDecimal;
+
+import static club._8b1t.exception.ResultCode.*;
 
 /**
 * @author 8bit
@@ -22,11 +26,8 @@ import java.math.BigDecimal;
 public class MerchantServiceImpl extends ServiceImpl<MerchantMapper, Merchant>
     implements MerchantService{
 
-    @Override
-    public Page<Merchant> getMerchantPage(Integer pageNumber, Integer pageSize) {
-        Page<Merchant> page = new Page<>(pageNumber, pageSize);
-        return this.page(page);
-    }
+    @Resource
+    private CosService cosService;
 
     @Override
     public boolean updateMerchantInfo(Merchant merchant) {
@@ -35,21 +36,19 @@ public class MerchantServiceImpl extends ServiceImpl<MerchantMapper, Merchant>
 
     @Override
     public boolean updateName(Long merchantId, String name) {
-        // 创建更新条件
-        LambdaUpdateWrapper<Merchant> updateWrapper = new LambdaUpdateWrapper<Merchant>()
-                .eq(Merchant::getId, merchantId)
-                .set(Merchant::getName, name);
-        
-        return this.update(updateWrapper);
+        Merchant merchant = this.getById(merchantId);
+        ExceptionUtil.throwIfNull(merchant, BAD_REQUEST, "店铺不存在");
+        merchant.setName(name);
+        return this.updateById(merchant);
     }
 
     @Override
-    public boolean updateLogo(Long merchantId, String logo) {
-        LambdaUpdateWrapper<Merchant> updateWrapper = new LambdaUpdateWrapper<Merchant>()
-                .eq(Merchant::getId, merchantId)
-                .set(Merchant::getLogo, logo);
-        
-        return this.update(updateWrapper);
+    public boolean updateLogo(Long merchantId, @RequestParam("file") MultipartFile file) {
+        Merchant merchant = this.getById(merchantId);
+        ExceptionUtil.throwIfNull(merchant, BAD_REQUEST, "店铺不存在");
+        String logo = cosService.uploadLogo(merchantId, file);
+        merchant.setLogo(logo);
+        return this.updateById(merchant);
     }
 
     @Override

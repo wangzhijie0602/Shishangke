@@ -1,8 +1,6 @@
 package club._8b1t.controller;
 
 import club._8b1t.common.Result;
-import club._8b1t.exception.BusinessException;
-import club._8b1t.exception.ResultCode;
 import club._8b1t.model.dto.user.*;
 import club._8b1t.util.ExceptionUtil;
 import club._8b1t.model.entity.User;
@@ -14,7 +12,6 @@ import cn.dev33.satoken.stp.SaTokenInfo;
 import cn.dev33.satoken.stp.StpUtil;
 import cn.dev33.satoken.secure.BCrypt;
 import cn.hutool.core.util.RandomUtil;
-import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.linpeilie.Converter;
@@ -39,7 +36,7 @@ public class UserController {
     private static final String NO_ADMIN_RIGHTS = "无管理员权限";
 
     @PostMapping("/login")
-    public Result<SaTokenInfo> login(@RequestBody @Valid UserLoginRequest request,
+    public Result<SaTokenInfo> login(@RequestBody @Valid LoginRequest request,
                                      @RequestParam(defaultValue = "false") Boolean remember) {
         // 根据用户名查询用户
         User user = userService.getOne(new LambdaQueryWrapper<User>()
@@ -66,7 +63,7 @@ public class UserController {
     }
 
     @PostMapping("/register")
-    public Result<Long> register(@RequestBody @Valid UserRegisterRequest request) {
+    public Result<Long> register(@RequestBody @Valid RegisterRequest request) {
         String username = request.getUsername();
         String password = request.getPassword();
 
@@ -132,9 +129,9 @@ public class UserController {
 
     @PostMapping({"/update/password", "/{id}/update/password"})
     public Result<Void> updatePassword(@PathVariable(required = false) String id,
-                                         @RequestBody @Valid UserChangePassword request) {
+                                         @RequestBody @Valid PasswordRequest request) {
         long userId;
-        boolean success = false;
+        boolean success;
 
         if (id == null) {
             userId = StpUtil.getLoginIdAsLong();
@@ -269,7 +266,7 @@ public class UserController {
     @SaCheckRole("ADMIN")
     public Result<Page<UserVO>> getUserList(@RequestParam(defaultValue = "1") Integer pageNum,
                                             @RequestParam(defaultValue = "10") Integer pageSize,
-                                            @RequestBody(required = false) UserQueryRequest request) {
+                                            @RequestBody(required = false) QueryRequest request) {
         User user = converter.convert(request, User.class);
 
         // 查询用户列表

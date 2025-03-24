@@ -251,7 +251,7 @@ public class CustomerController {
     public Result<Page<MerchantVO>> getMerchants(@RequestParam(defaultValue = "1") Integer pageNumber,
                                                  @RequestParam(defaultValue = "10") Integer pageSize) {
 
-        Page<Merchant> merchantPage = merchantService.getMerchantPage(pageNumber, pageSize);
+        Page<Merchant> merchantPage = merchantService.getMerchantList(null, pageNumber, pageSize);
 
         Page<MerchantVO> merchantVOPage = new Page<>(merchantPage.getCurrent(), merchantPage.getSize(), merchantPage.getTotal());
 

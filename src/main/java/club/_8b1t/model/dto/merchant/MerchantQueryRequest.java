@@ -9,11 +9,7 @@ import java.math.BigDecimal;
  */
 @Data
 public class MerchantQueryRequest {
-    /**
-     * 用户ID
-     */
-    private Long userId;
-    
+
     /**
      * 商家名称
      */

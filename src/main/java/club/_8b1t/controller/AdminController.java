@@ -5,18 +5,12 @@ import club._8b1t.exception.BusinessException;
 import club._8b1t.exception.ResultCode;
 import club._8b1t.model.dto.merchant.MerchantQueryRequest;
 import club._8b1t.model.dto.merchant.MerchantUpdateRequest;
-import club._8b1t.model.dto.user.UserCreateRequest;
-import club._8b1t.model.dto.user.UserQueryRequest;
-import club._8b1t.model.dto.user.UserUpdateRequest;
 import club._8b1t.model.entity.Merchant;
-import club._8b1t.model.entity.User;
 import club._8b1t.model.enums.MerchantStatusEnum;
 import club._8b1t.model.vo.MerchantVO;
-import club._8b1t.model.vo.UserVO;
 import club._8b1t.service.MerchantService;
 import club._8b1t.service.UserService;
 import club._8b1t.util.ResultUtil;
-import cn.dev33.satoken.annotation.SaCheckRole;
 import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -136,7 +130,7 @@ public class AdminController {
             throw new BusinessException(ResultCode.NOT_FOUND, "商家不存在");
         }
         
-        boolean updated = merchantService.updateLogo(id, logo);
+//        boolean updated = merchantService.updateLogo(id, logo);
         
         if (!updated) {
             throw new BusinessException(ResultCode.INTERNAL_SERVER_ERROR, "更新失败");

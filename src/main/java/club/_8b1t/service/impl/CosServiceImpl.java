@@ -37,8 +37,13 @@ public class CosServiceImpl implements CosService {
     }
 
     @Override
-    public String uploadDishImage(Long userId, MultipartFile file) {
-        return uploadImage(file, String.format("/dish/%s", userId));
+    public String uploadLogo(Long merchantId, MultipartFile multipartFile) {
+        return uploadImage(multipartFile, String.format("/merchant/%s", merchantId));
+    }
+
+    @Override
+    public String uploadMenuLogo(Long menuId, MultipartFile file) {
+        return uploadImage(file, String.format("/dish/%s", menuId));
     }
 
     @Override

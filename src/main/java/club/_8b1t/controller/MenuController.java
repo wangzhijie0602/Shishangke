@@ -217,7 +217,7 @@ public class MenuController {
             throw new BusinessException(ResultCode.BAD_REQUEST, "请选择要上传的图片");
         }
         Long userId = StpUtil.getLoginIdAsLong();
-        String imageUrl = cosService.uploadDishImage(userId, file);
+        String imageUrl = cosService.uploadMenuLogo(userId, file);
         return ResultUtil.success("图片上传成功", imageUrl);
     }
 } 
