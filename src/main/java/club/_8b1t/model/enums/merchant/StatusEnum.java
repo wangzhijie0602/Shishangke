@@ -1,4 +1,6 @@
-package club._8b1t.model.enums;
+package club._8b1t.model.enums.merchant;
+
+import com.baomidou.mybatisplus.annotation.EnumValue;
 
 import lombok.Getter;
 
@@ -6,7 +8,7 @@ import lombok.Getter;
  * 商家状态枚举类
  */
 @Getter
-public enum MerchantStatusEnum {
+public enum StatusEnum {
     
     OPEN("OPEN", "营业中"),
     CLOSED("CLOSED", "休息中"),
@@ -14,18 +16,12 @@ public enum MerchantStatusEnum {
     PENDING_REVIEW("PENDING_REVIEW", "待审核"),
     REJECTED("REJECTED", "审核拒绝"),
     BANNED("BANNED", "已封禁");
-    
-    /**
-     * 状态编码
-     */
+
+    @EnumValue
     private final String code;
-    
-    /**
-     * 状态描述
-     */
     private final String description;
     
-    MerchantStatusEnum(String code, String description) {
+    StatusEnum(String code, String description) {
         this.code = code;
         this.description = description;
     }
@@ -36,12 +32,12 @@ public enum MerchantStatusEnum {
      * @param code 状态编码
      * @return 对应的枚举值，如果不存在则返回null
      */
-    public static MerchantStatusEnum getByCode(String code) {
+    public static StatusEnum getByCode(String code) {
         if (code == null) {
-            return null;/
+            return null;
         }
         
-        for (MerchantStatusEnum status : MerchantStatusEnum.values()) {
+        for (StatusEnum status : StatusEnum.values()) {
             if (status.getCode().equals(code)) {
                 return status;
             }

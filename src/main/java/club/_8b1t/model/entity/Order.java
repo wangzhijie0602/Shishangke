@@ -1,39 +1,36 @@
 package club._8b1t.model.entity;
 
+import club._8b1t.model.enums.order.OrderStatus;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableLogic;
 import com.baomidou.mybatisplus.annotation.TableName;
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
+import java.util.Date;
 import lombok.Data;
 
 /**
- * 订单实体类
+ * 订单表
+ * @TableName order
  */
+@TableName(value ="order")
 @Data
-@TableName("`order`")
 public class Order {
     /**
      * 订单ID
      */
-    @TableId(type = IdType.AUTO)
-    private Long orderId;
+    @TableId(type = IdType.ASSIGN_ID)
+    private Long id;
 
     /**
      * 用户ID
      */
-    private Long userId;
+    private Long customerId;
 
     /**
      * 商家ID
      */
-    private Integer merchantId;
-
-    /**
-     * 订单编号
-     */
-    private String orderNumber;
+    private Long merchantId;
 
     /**
      * 订单总金额
@@ -41,34 +38,34 @@ public class Order {
     private BigDecimal totalAmount;
 
     /**
-     * 订单状态(PENDING:待付款, PAID:已付款, PREPARING:准备中, DELIVERING:配送中, COMPLETED:已完成, CANCELLED:已取消)
+     * 实际支付金额
      */
-    private String status;
+    private BigDecimal actualAmount;
 
     /**
-     * 支付方式(WECHAT:微信, ALIPAY:支付宝, CASH:现金)
+     * 订单状态
      */
-    private String paymentMethod;
+    private OrderStatus status;
 
     /**
-     * 支付状态(UNPAID:未支付, PAID:已支付, REFUNDED:已退款)
+     * 收货地址ID
      */
-    private String paymentStatus;
+    private Long addressId;
 
     /**
-     * 配送地址
+     * 收货人姓名
      */
-    private String address;
+    private String receiverName;
 
     /**
-     * 联系电话
+     * 收货人电话
      */
-    private String phone;
+    private String receiverPhone;
 
     /**
-     * 订单备注
+     * 收货地址
      */
-    private String remark;
+    private String receiverAddress;
 
     /**
      * 配送费
@@ -76,22 +73,32 @@ public class Order {
     private BigDecimal deliveryFee;
 
     /**
+     * 订单备注
+     */
+    private String remark;
+
+    /**
      * 预计送达时间
      */
-    private LocalDateTime expectedTime;
+    private Date expectedDeliveryTime;
+
+    /**
+     * 实际送达时间
+     */
+    private Date actualDeliveryTime;
 
     /**
      * 创建时间
      */
-    private LocalDateTime createdAt;
+    private Date createdAt;
 
     /**
      * 更新时间
      */
-    private LocalDateTime updatedAt;
+    private Date updatedAt;
 
     /**
-     * 是否删除（0：未删除，1：已删除）
+     * 是否删除
      */
     @TableLogic
     private Integer isDeleted;

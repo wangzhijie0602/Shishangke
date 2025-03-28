@@ -1,5 +1,7 @@
 package club._8b1t.model.entity;
 
+import club._8b1t.model.enums.menu.MenuCategory;
+import club._8b1t.model.enums.menu.MenuStatus;
 import club._8b1t.model.vo.MenuVO;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
@@ -48,7 +50,7 @@ public class Menu {
     /**
      * 菜品分类
      */
-    private String category;
+    private MenuCategory category;
 
     /**
      * 菜品图片URL
@@ -58,7 +60,7 @@ public class Menu {
     /**
      * 菜品状态
      */
-    private String status;
+    private MenuStatus status;
 
     /**
      * 排序权重（数值越小越靠前）

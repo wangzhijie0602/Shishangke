@@ -1,5 +1,7 @@
 package club._8b1t.model.entity;
 
+import club._8b1t.model.enums.User.StatusEnum;
+import club._8b1t.model.enums.User.RoleEnum;
 import club._8b1t.model.vo.UserVO;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
@@ -57,12 +59,12 @@ public class User {
     /**
      * 账号状态
      */
-    private String status;
+    private StatusEnum status;
 
     /**
-     * 
+     * 用户角色
      */
-    private String role;
+    private RoleEnum role;
 
     /**
      * 最后登录时间

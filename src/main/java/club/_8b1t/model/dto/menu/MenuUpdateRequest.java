@@ -1,6 +1,8 @@
 package club._8b1t.model.dto.menu;
 
 import club._8b1t.model.entity.Menu;
+import club._8b1t.model.enums.menu.MenuCategory;
+import club._8b1t.model.enums.menu.MenuStatus;
 import io.github.linpeilie.annotations.AutoMapper;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
@@ -40,7 +42,7 @@ public class MenuUpdateRequest {
     /**
      * 菜品分类
      */
-    private String category;
+    private MenuCategory category;
 
     /**
      * 菜品图片URL
@@ -50,7 +52,7 @@ public class MenuUpdateRequest {
     /**
      * 菜品状态
      */
-    private String status;
+    private MenuStatus status;
 
     /**
      * 排序权重（数值越小越靠前）

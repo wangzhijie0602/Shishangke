@@ -10,16 +10,20 @@ import club._8b1t.model.entity.Menu;
 import club._8b1t.model.vo.MenuVO;
 import club._8b1t.service.CosService;
 import club._8b1t.service.MenuService;
+import club._8b1t.util.ExceptionUtil;
 import club._8b1t.util.ResultUtil;
 import cn.dev33.satoken.stp.StpUtil;
 import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.linpeilie.Converter;
+import io.swagger.v3.oas.annotations.Operation;
 import jakarta.annotation.Resource;
 import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+
+import static club._8b1t.exception.ResultCode.OPERATION_FAILED;
 
 @RestController
 @RequestMapping("/api/v1/menu")
@@ -43,6 +47,7 @@ public class MenuController {
      * @return 菜单列表
      */
     @PostMapping("/list")
+    @Operation(operationId = "menu_list")
     public Result<Page<MenuVO>> getMenuList(@RequestParam(defaultValue = "1") Integer pageNum,
                                             @RequestParam(defaultValue = "10") Integer pageSize,
                                             @RequestBody(required = false) MenuQueryRequest request) {
@@ -55,9 +60,9 @@ public class MenuController {
             // 根据菜品名称模糊查询
             wrapper.like(StrUtil.isNotBlank(request.getName()), Menu::getName, request.getName());
             // 根据菜品分类查询
-            wrapper.eq(StrUtil.isNotBlank(request.getCategory()), Menu::getCategory, request.getCategory());
+            wrapper.eq(request.getCategory() != null, Menu::getCategory, request.getCategory());
             // 根据菜品状态查询
-            wrapper.eq(StrUtil.isNotBlank(request.getStatus()), Menu::getStatus, request.getStatus());
+            wrapper.eq(request.getStatus() != null, Menu::getStatus, request.getStatus());
             // 根据价格范围查询
             wrapper.ge(request.getMinPrice() != null, Menu::getPrice, request.getMinPrice());
             wrapper.le(request.getMaxPrice() != null, Menu::getPrice, request.getMaxPrice());
@@ -82,15 +87,14 @@ public class MenuController {
      * @return 创建结果
      */
     @PostMapping("/create")
+    @Operation(operationId = "menu_create")
     public Result<Integer> create(@RequestBody @Valid MenuCreateRequest request) {
         // 将请求参数转换为菜单对象
         Menu menu = converter.convert(request, Menu.class);
         // 保存菜单信息
-        boolean saved = menuService.save(menu);
+        boolean success = menuService.save(menu);
         // 如果保存失败，抛出系统异常
-        if (!saved) {
-            throw new BusinessException(ResultCode.INTERNAL_SERVER_ERROR);
-        }
+        ExceptionUtil.throwIfNot(success, OPERATION_FAILED);
         // 返回创建成功的响应
         return ResultUtil.success("创建成功", menu.getMenuId());
     }
@@ -102,6 +106,7 @@ public class MenuController {
      * @return 更新结果
      */
     @PostMapping("/update")
+    @Operation(operationId = "menu_update")
     public Result<String> update(@RequestBody @Valid MenuUpdateRequest request) {
         // 检查菜单是否存在
         Menu existMenu = menuService.getById(request.getMenuId());
@@ -128,6 +133,7 @@ public class MenuController {
      * @return 删除结果
      */
     @GetMapping("/{id}/delete")
+    @Operation(operationId = "menu_delete")
     public Result<String> delete(@PathVariable String id) {
         // 检查菜单是否存在
         Menu existMenu = menuService.getById(id);
@@ -152,6 +158,7 @@ public class MenuController {
      * @return 菜单详情
      */
     @GetMapping("/{id}/get")
+    @Operation(operationId = "menu_get")
     public Result<MenuVO> getMenu(@PathVariable String id) {
         // 获取菜单信息
         Menu menu = menuService.getById(id);
@@ -173,6 +180,7 @@ public class MenuController {
      * @return 菜单列表
      */
     @PostMapping("/merchant/{merchantId}")
+    @Operation(operationId = "menu_get_by_merchant")
     public Result<Page<MenuVO>> getMenuByMerchant(@PathVariable String merchantId,
                                                   @RequestParam(defaultValue = "1") Integer pageNum,
                                                   @RequestParam(defaultValue = "50") Integer pageSize,
@@ -185,9 +193,9 @@ public class MenuController {
             // 根据菜品名称模糊查询
             wrapper.like(StrUtil.isNotBlank(request.getName()), Menu::getName, request.getName());
             // 根据菜品分类查询
-            wrapper.eq(StrUtil.isNotBlank(request.getCategory()), Menu::getCategory, request.getCategory());
+            wrapper.eq(request.getCategory() != null, Menu::getCategory, request.getCategory());
             // 根据菜品状态查询
-            wrapper.eq(StrUtil.isNotBlank(request.getStatus()), Menu::getStatus, request.getStatus());
+            wrapper.eq(request.getStatus() != null, Menu::getStatus, request.getStatus());
             // 根据价格范围查询
             wrapper.ge(request.getMinPrice() != null, Menu::getPrice, request.getMinPrice());
             wrapper.le(request.getMaxPrice() != null, Menu::getPrice, request.getMaxPrice());
@@ -212,6 +220,7 @@ public class MenuController {
      * @return 图片URL
      */
     @PostMapping("/upload/image")
+    @Operation(operationId = "menu_upload_image")
     public Result<String> uploadImage(@RequestParam("file") MultipartFile file) {
         if (file == null || file.isEmpty()) {
             throw new BusinessException(ResultCode.BAD_REQUEST, "请选择要上传的图片");

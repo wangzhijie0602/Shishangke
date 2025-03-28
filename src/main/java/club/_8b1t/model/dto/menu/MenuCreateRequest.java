@@ -1,6 +1,7 @@
 package club._8b1t.model.dto.menu;
 
 import club._8b1t.model.entity.Menu;
+import club._8b1t.model.enums.menu.MenuCategory;
 import io.github.linpeilie.annotations.AutoMapper;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -38,7 +39,7 @@ public class MenuCreateRequest {
     /**
      * 菜品分类
      */
-    private String category;
+    private MenuCategory category;
 
     /**
      * 菜品图片URL

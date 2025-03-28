@@ -1,5 +1,7 @@
 package club._8b1t.model.dto.menu;
 
+import club._8b1t.model.enums.menu.MenuCategory;
+import club._8b1t.model.enums.menu.MenuStatus;
 import lombok.Data;
 
 import java.math.BigDecimal;
@@ -20,12 +22,12 @@ public class MenuQueryRequest {
     /**
      * 菜品分类
      */
-    private String category;
+    private MenuCategory category;
 
     /**
      * 菜品状态
      */
-    private String status;
+    private MenuStatus status;
 
     /**
      * 最低价格

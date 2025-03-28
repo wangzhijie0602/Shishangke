@@ -1,11 +1,11 @@
 package club._8b1t.service.impl;
 
+import club._8b1t.model.enums.merchant.StatusEnum;
 import club._8b1t.service.CosService;
 import club._8b1t.util.ExceptionUtil;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import club._8b1t.model.entity.Merchant;
-import club._8b1t.model.enums.MerchantStatusEnum;
 import club._8b1t.service.MerchantService;
 import club._8b1t.mapper.MerchantMapper;
 import jakarta.annotation.Resource;
@@ -103,7 +103,7 @@ public class MerchantServiceImpl extends ServiceImpl<MerchantMapper, Merchant>
     }
 
     @Override
-    public boolean updateStatus(Long merchantId, MerchantStatusEnum status) {
+    public boolean updateStatus(Long merchantId, StatusEnum status) {
         LambdaUpdateWrapper<Merchant> updateWrapper = new LambdaUpdateWrapper<Merchant>()
                 .eq(Merchant::getId, merchantId)
                 .set(Merchant::getStatus, status);

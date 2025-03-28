@@ -5,27 +5,29 @@
 <mapper namespace="club._8b1t.mapper.OrderMapper">
 
     <resultMap id="BaseResultMap" type="club._8b1t.model.entity.Order">
-            <id property="orderId" column="order_id" />
-            <result property="userId" column="user_id" />
+            <id property="id" column="id" />
+            <result property="customerId" column="customer_id" />
             <result property="merchantId" column="merchant_id" />
-            <result property="orderNumber" column="order_number" />
             <result property="totalAmount" column="total_amount" />
+            <result property="actualAmount" column="actual_amount" />
             <result property="status" column="status" />
-            <result property="paymentMethod" column="payment_method" />
-            <result property="paymentStatus" column="payment_status" />
-            <result property="address" column="address" />
-            <result property="phone" column="phone" />
-            <result property="remark" column="remark" />
+            <result property="addressId" column="address_id" />
+            <result property="receiverName" column="receiver_name" />
+            <result property="receiverPhone" column="receiver_phone" />
+            <result property="receiverAddress" column="receiver_address" />
             <result property="deliveryFee" column="delivery_fee" />
-            <result property="expectedTime" column="expected_time" />
+            <result property="remark" column="remark" />
+            <result property="expectedDeliveryTime" column="expected_delivery_time" />
+            <result property="actualDeliveryTime" column="actual_delivery_time" />
             <result property="createdAt" column="created_at" />
             <result property="updatedAt" column="updated_at" />
             <result property="isDeleted" column="is_deleted" />
     </resultMap>
 
     <sql id="Base_Column_List">
-        order_id,user_id,merchant_id,order_number,total_amount,status,
-        payment_method,payment_status,address,phone,remark,
-        delivery_fee,expected_time,created_at,updated_at,is_deleted
+        id,customer_id,merchant_id,total_amount,actual_amount,status,
+        address_id,receiver_name,receiver_phone,receiver_address,delivery_fee,
+        remark,expected_delivery_time,actual_delivery_time,created_at,updated_at,
+        is_deleted
     </sql>
 </mapper>

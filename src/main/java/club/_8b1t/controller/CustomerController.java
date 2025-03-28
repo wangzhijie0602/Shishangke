@@ -11,6 +11,8 @@ import club._8b1t.model.entity.Customer;
 import club._8b1t.model.entity.CustomerAddress;
 import club._8b1t.model.entity.Menu;
 import club._8b1t.model.entity.Merchant;
+import club._8b1t.model.enums.menu.MenuStatus;
+import club._8b1t.model.enums.merchant.StatusEnum;
 import club._8b1t.model.vo.CustomerAddressVO;
 import club._8b1t.model.vo.CustomerVO;
 import club._8b1t.model.vo.MerchantVO;
@@ -20,8 +22,10 @@ import club._8b1t.service.MenuService;
 import club._8b1t.service.MerchantService;
 import club._8b1t.util.ResultUtil;
 import cn.dev33.satoken.stp.StpUtil;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.linpeilie.Converter;
+import io.swagger.v3.oas.annotations.Operation;
 import jakarta.annotation.Resource;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
@@ -46,7 +50,7 @@ public class CustomerController {
 
     @Resource
     private MenuService menuService;
-    
+
     @Resource
     private CustomerAddressService customerAddressService;
 
@@ -54,6 +58,7 @@ public class CustomerController {
      * 注册顾客账号
      */
     @PostMapping("/register")
+    @Operation(operationId = "customer_register")
     public Result<String> registerCustomer(@RequestBody @Valid CustomerCreateRequest request) {
         // 检查用户名是否已存在
         Customer existingCustomer = customerService.getCustomerByUsername(request.getUsername());
@@ -74,6 +79,7 @@ public class CustomerController {
      * 登录
      */
     @PostMapping("/login")
+    @Operation(operationId = "customer_login")
     public Result<CustomerVO> login(@RequestBody @Valid CustomerLoginRequest request) {
         log.info("用户登录：username={}", request.getUsername());
         // 登录验证
@@ -96,6 +102,7 @@ public class CustomerController {
      * 退出登录
      */
     @PostMapping("/logout")
+    @Operation(operationId = "customer_logout")
     public Result<String> logout() {
         StpUtil.logout();
         return ResultUtil.success("退出登录成功");
@@ -105,6 +112,7 @@ public class CustomerController {
      * 获取当前登录用户信息
      */
     @GetMapping("/current")
+    @Operation(operationId = "customer_get_current")
     public Result<CustomerVO> current() {
 
         // 获取登录用户ID
@@ -126,6 +134,7 @@ public class CustomerController {
      * 更新顾客真实姓名
      */
     @PostMapping("/update/nickname")
+    @Operation(operationId = "customer_update_nickname")
     public Result<String> updateRealName(@RequestParam String nickname) {
 
         // 获取当前登录用户ID
@@ -150,6 +159,7 @@ public class CustomerController {
      * 更新顾客性别
      */
     @PostMapping("/update/gender")
+    @Operation(operationId = "customer_update_gender")
     public Result<String> updateGender(@RequestParam String gender) {
 
         // 获取当前登录用户ID
@@ -179,6 +189,7 @@ public class CustomerController {
      * 更新顾客出生日期
      */
     @PostMapping("/update/birthdate")
+    @Operation(operationId = "customer_update_birthdate")
     public Result<String> updateBirthDate(@RequestParam String birthDate) {
 
         // 获取当前登录用户ID
@@ -203,6 +214,7 @@ public class CustomerController {
      * 更新顾客饮食偏好
      */
     @PostMapping("/update/preferences")
+    @Operation(operationId = "customer_update_preferences")
     public Result<String> updatePreferences(@RequestParam String preferences) {
 
         // 获取当前登录用户ID
@@ -227,6 +239,7 @@ public class CustomerController {
      * 更新顾客头像
      */
     @PostMapping("/update/avatar")
+    @Operation(operationId = "customer_update_avatar")
     public Result<String> updateAvatar(@RequestParam("file") MultipartFile file) {
 
         // 获取当前登录用户ID
@@ -248,10 +261,11 @@ public class CustomerController {
     }
 
     @GetMapping("/merchants")
+    @Operation(operationId = "customer_get_merchants")
     public Result<Page<MerchantVO>> getMerchants(@RequestParam(defaultValue = "1") Integer pageNumber,
                                                  @RequestParam(defaultValue = "10") Integer pageSize) {
 
-        Page<Merchant> merchantPage = merchantService.getMerchantList(null, pageNumber, pageSize);
+        Page<Merchant> merchantPage = merchantService.page(new Page<>(pageNumber, pageSize), new LambdaQueryWrapper<>(Merchant.class).eq(Merchant::getStatus, StatusEnum.OPEN));
 
         Page<MerchantVO> merchantVOPage = new Page<>(merchantPage.getCurrent(), merchantPage.getSize(), merchantPage.getTotal());
 
@@ -262,6 +276,7 @@ public class CustomerController {
     }
 
     @GetMapping("/merchant/{merchantId}")
+    @Operation(operationId = "customer_get_merchant")
     public Result<MerchantVO> getMerchant(@PathVariable String merchantId) {
 
         Merchant merchant = merchantService.getById(merchantId);
@@ -277,9 +292,12 @@ public class CustomerController {
     }
 
     @GetMapping("/menu/{merchantId}")
+    @Operation(operationId = "customer_get_menu")
     public Result<List<Menu>> getMerchantMenus(@PathVariable String merchantId) {
 
-        List<Menu> menuList = menuService.getMenuByMerchantId(Long.parseLong(merchantId));
+        List<Menu> menuList = menuService.list(new LambdaQueryWrapper<>(Menu.class)
+                .eq(Menu::getMerchantId, merchantId)
+                .in(Menu::getStatus, MenuStatus.ENABLED, MenuStatus.SOLD_OUT));
 
         return ResultUtil.success(menuList);
 
@@ -289,133 +307,139 @@ public class CustomerController {
      * 获取用户地址列表
      */
     @GetMapping("/address/list")
+    @Operation(operationId = "customer_address_list")
     public Result<List<CustomerAddressVO>> getAddressList() {
         // 获取当前登录用户ID
         String customerId = StpUtil.getLoginIdAsString();
-        
+
         // 获取地址列表
         List<CustomerAddress> addressList = customerAddressService.getAddressList(Long.parseLong(customerId));
-        
+
         // 转换为VO
         List<CustomerAddressVO> addressVOList = converter.convert(addressList, CustomerAddressVO.class);
-        
+
         return ResultUtil.success(addressVOList);
     }
-    
+
     /**
      * 获取用户默认地址
      */
     @GetMapping("/address/default")
+    @Operation(operationId = "customer_address_default")
     public Result<CustomerAddressVO> getDefaultAddress() {
         // 获取当前登录用户ID
         String customerId = StpUtil.getLoginIdAsString();
-        
+
         // 获取默认地址
         CustomerAddress defaultAddress = customerAddressService.getDefaultAddress(Long.parseLong(customerId));
         if (defaultAddress == null) {
             return ResultUtil.success("未设置默认地址", null);
         }
-        
+
         // 转换为VO
         CustomerAddressVO addressVO = converter.convert(defaultAddress, CustomerAddressVO.class);
-        
+
         return ResultUtil.success(addressVO);
     }
-    
+
     /**
      * 添加新地址
      */
     @PostMapping("/address/add")
+    @Operation(operationId = "customer_address_add")
     public Result<String> addAddress(@RequestBody @Valid CustomerAddressCreateRequest request) {
         // 获取当前登录用户ID
         Long customerId = StpUtil.getLoginIdAsLong();
-        
+
         // 将请求转换为实体
         CustomerAddress address = converter.convert(request, CustomerAddress.class);
-        
+
         // 设置用户ID
         address.setCustomerId(customerId);
-        
+
         // 添加地址
         boolean added = customerAddressService.addAddress(address);
         if (!added) {
             throw new BusinessException(ResultCode.INTERNAL_SERVER_ERROR, "添加地址失败");
         }
-        
+
         return ResultUtil.success("添加地址成功");
     }
-    
+
     /**
      * 更新地址信息
      */
     @PostMapping("/address/update")
+    @Operation(operationId = "customer_address_update")
     public Result<String> updateAddress(@RequestBody @Valid CustomerAddressUpdateRequest request) {
         // 获取当前登录用户ID
         Long customerId = StpUtil.getLoginIdAsLong();
-        
+
         // 验证地址所有权
         CustomerAddress existingAddress = customerAddressService.getById(request.getId());
         if (existingAddress == null || !existingAddress.getCustomerId().equals(customerId)) {
             throw new BusinessException(ResultCode.BAD_REQUEST, "地址不存在或无权修改");
         }
-        
+
         // 将请求转换为实体
         CustomerAddress address = converter.convert(request, CustomerAddress.class);
-        
+
         // 设置用户ID
         address.setCustomerId(customerId);
-        
+
         // 更新地址
         boolean updated = customerAddressService.updateAddress(address);
         if (!updated) {
             throw new BusinessException(ResultCode.INTERNAL_SERVER_ERROR, "更新地址失败");
         }
-        
+
         return ResultUtil.success("更新地址成功");
     }
-    
+
     /**
      * 设置默认地址
      */
     @PostMapping("/address/set-default/{addressId}")
+    @Operation(operationId = "customer_address_set_default")
     public Result<String> setDefaultAddress(@PathVariable String addressId) {
         // 获取当前登录用户ID
         Long customerId = StpUtil.getLoginIdAsLong();
-        
+
         // 验证地址所有权
         CustomerAddress existingAddress = customerAddressService.getById(addressId);
         if (existingAddress == null || !existingAddress.getCustomerId().equals(customerId)) {
             throw new BusinessException(ResultCode.BAD_REQUEST, "地址不存在或无权修改");
         }
-        
+
         // 设置默认地址
         boolean set = customerAddressService.setDefaultAddress(Long.parseLong(addressId), customerId);
         if (!set) {
             throw new BusinessException(ResultCode.INTERNAL_SERVER_ERROR, "设置默认地址失败");
         }
-        
+
         return ResultUtil.success("设置默认地址成功");
     }
-    
+
     /**
      * 删除地址
      */
     @PostMapping("/address/delete/{addressId}")
+    @Operation(operationId = "customer_address_delete")
     public Result<String> deleteAddress(@PathVariable String addressId) {
         // 获取当前登录用户ID
         Long customerId = StpUtil.getLoginIdAsLong();
-        
+
         // 验证地址所有权
         CustomerAddress existingAddress = customerAddressService.getById(addressId);
         if (existingAddress == null || !existingAddress.getCustomerId().equals(customerId)) {
             throw new BusinessException(ResultCode.BAD_REQUEST, "地址不存在或无权删除");
         }
-        
+
         boolean deleted = customerAddressService.removeById(existingAddress);
         if (!deleted) {
             throw new BusinessException(ResultCode.INTERNAL_SERVER_ERROR, "删除地址失败");
         }
-        
+
         return ResultUtil.success("删除地址成功");
     }
 

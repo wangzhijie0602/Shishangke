@@ -1,8 +1,7 @@
 package club._8b1t.service;
 
 import club._8b1t.model.entity.Merchant;
-import club._8b1t.model.enums.MerchantStatusEnum;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import club._8b1t.model.enums.merchant.StatusEnum;
 import com.baomidou.mybatisplus.extension.service.IService;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
@@ -91,5 +90,5 @@ public interface MerchantService extends IService<Merchant> {
      * @param status     新的状态
      * @return 是否更新成功
      */
-    boolean updateStatus(Long merchantId, MerchantStatusEnum status);
+    boolean updateStatus(Long merchantId, StatusEnum status);
 }
