@@ -1,20 +1,24 @@
 package club._8b1t.model.entity;
 
 import club._8b1t.model.enums.order.OrderStatus;
+import club._8b1t.model.vo.OrderVO;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableLogic;
 import com.baomidou.mybatisplus.annotation.TableName;
 import java.math.BigDecimal;
 import java.util.Date;
+
+import io.github.linpeilie.annotations.AutoMapper;
 import lombok.Data;
 
 /**
  * 订单表
  * @TableName order
  */
-@TableName(value ="order")
+@TableName(value ="`order`")
 @Data
+@AutoMapper(target = OrderVO.class)
 public class Order {
     /**
      * 订单ID
@@ -33,6 +37,11 @@ public class Order {
     private Long merchantId;
 
     /**
+     * 商家名称
+     */
+    private String merchantName;
+
+    /**
      * 订单总金额
      */
     private BigDecimal totalAmount;
@@ -46,11 +55,6 @@ public class Order {
      * 订单状态
      */
     private OrderStatus status;
-
-    /**
-     * 收货地址ID
-     */
-    private Long addressId;
 
     /**
      * 收货人姓名

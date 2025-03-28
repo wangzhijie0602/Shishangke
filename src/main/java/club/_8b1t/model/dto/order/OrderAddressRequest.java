@@ -6,16 +6,12 @@ import lombok.Data;
 
 @Data
 @AutoMapper(target = Order.class)
-public class OrderCreateRequest {
-    /**
-     * 用户ID
-     */
-    private String customerId;
+public class OrderAddressRequest {
 
     /**
-     * 商家ID
+     * 订单ID
      */
-    private String merchantId;
+    private String id;
 
     /**
      * 收货人姓名
@@ -31,10 +27,5 @@ public class OrderCreateRequest {
      * 收货地址
      */
     private String receiverAddress;
-
-    /**
-     * 订单备注
-     */
-    private String remark;
 
 }

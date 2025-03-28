@@ -1,9 +1,9 @@
 package club._8b1t.service.impl;
 
+import club._8b1t.mapper.OrderItemMapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import club._8b1t.model.entity.OrderItem;
 import club._8b1t.service.OrderItemService;
-import generator.mapper.OrderItemMapper;
 import org.springframework.stereotype.Service;
 
 /**

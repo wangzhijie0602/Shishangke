@@ -88,7 +88,7 @@ public class MenuController {
      */
     @PostMapping("/create")
     @Operation(operationId = "menu_create")
-    public Result<Integer> create(@RequestBody @Valid MenuCreateRequest request) {
+    public Result<String> create(@RequestBody @Valid MenuCreateRequest request) {
         // 将请求参数转换为菜单对象
         Menu menu = converter.convert(request, Menu.class);
         // 保存菜单信息
@@ -96,7 +96,7 @@ public class MenuController {
         // 如果保存失败，抛出系统异常
         ExceptionUtil.throwIfNot(success, OPERATION_FAILED);
         // 返回创建成功的响应
-        return ResultUtil.success("创建成功", menu.getMenuId());
+        return ResultUtil.success("创建成功", menu.getMenuId().toString());
     }
 
     /**

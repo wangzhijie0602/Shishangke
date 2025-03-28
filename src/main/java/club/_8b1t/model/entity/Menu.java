@@ -25,7 +25,7 @@ public class Menu {
      * 菜单项ID，主键，自增
      */
     @TableId(type = IdType.AUTO)
-    private Integer menuId;
+    private Long menuId;
 
     /**
      * 所属商家ID（外键关联 merchant.id）

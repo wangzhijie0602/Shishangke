@@ -1,10 +1,14 @@
 package club._8b1t.model.entity;
 
+import club._8b1t.model.vo.OrderItemVO;
+import club._8b1t.model.vo.OrderVO;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import java.math.BigDecimal;
 import java.util.Date;
+
+import io.github.linpeilie.annotations.AutoMapper;
 import lombok.Data;
 
 /**
@@ -13,6 +17,7 @@ import lombok.Data;
  */
 @TableName(value ="order_item")
 @Data
+@AutoMapper(target = OrderItemVO.class)
 public class OrderItem {
     /**
      * 订单项ID

@@ -1,9 +1,11 @@
 package club._8b1t.model.vo;
 
+import club._8b1t.model.enums.order.OrderStatus;
 import lombok.Data;
 
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
+import java.util.Date;
+import java.util.List;
 
 /**
  * 订单VO
@@ -14,27 +16,22 @@ public class OrderVO {
     /**
      * 订单ID
      */
-    private Long orderId;
+    private String id;
     
     /**
      * 用户ID
      */
-    private Long userId;
+    private String customerId;
     
     /**
      * 商家ID
      */
-    private Integer merchantId;
-    
+    private String merchantId;
+
     /**
      * 商家名称
      */
     private String merchantName;
-    
-    /**
-     * 订单编号
-     */
-    private String orderNumber;
     
     /**
      * 订单总金额
@@ -42,34 +39,29 @@ public class OrderVO {
     private BigDecimal totalAmount;
     
     /**
+     * 实际支付金额
+     */
+    private BigDecimal actualAmount;
+    
+    /**
      * 订单状态
      */
-    private String status;
+    private OrderStatus status;
     
     /**
-     * 支付方式
+     * 收货人姓名
      */
-    private String paymentMethod;
+    private String receiverName;
     
     /**
-     * 支付状态
+     * 收货人电话
      */
-    private String paymentStatus;
+    private String receiverPhone;
     
     /**
-     * 配送地址
+     * 收货地址
      */
-    private String address;
-    
-    /**
-     * 联系电话
-     */
-    private String phone;
-    
-    /**
-     * 订单备注
-     */
-    private String remark;
+    private String receiverAddress;
     
     /**
      * 配送费
@@ -77,17 +69,28 @@ public class OrderVO {
     private BigDecimal deliveryFee;
     
     /**
+     * 订单备注
+     */
+    private String remark;
+    
+    /**
      * 预计送达时间
      */
-    private LocalDateTime expectedTime;
+    private Date expectedDeliveryTime;
     
+    /**
+     * 实际送达时间
+     */
+    private Date actualDeliveryTime;
+
     /**
      * 创建时间
      */
-    private LocalDateTime createdAt;
+    private Date createdAt;
     
     /**
      * 更新时间
      */
-    private LocalDateTime updatedAt;
-}
+    private Date updatedAt;
+
+} 
