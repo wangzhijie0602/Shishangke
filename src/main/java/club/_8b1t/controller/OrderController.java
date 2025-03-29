@@ -32,6 +32,7 @@ import java.math.BigDecimal;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static club._8b1t.exception.ResultCode.FORBIDDEN;
 import static club._8b1t.exception.ResultCode.OPERATION_FAILED;
 
 @RestController
@@ -190,7 +191,7 @@ public class OrderController {
 
         Order order = orderService.getById(id);
         ExceptionUtil.throwIfNull(order, OPERATION_FAILED);
-
+        ExceptionUtil.throwIfNot(order.getStatus().equals(OrderStatus.PENDING), FORBIDDEN, "只能取消待支付的订单，请申请退款");
         order.setStatus(OrderStatus.CANCELLED);
         boolean success = orderService.updateById(order);
         ExceptionUtil.throwIfNot(success, OPERATION_FAILED);

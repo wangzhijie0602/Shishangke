@@ -139,7 +139,7 @@ CREATE TABLE `order_item` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='订单项表';
 
 CREATE TABLE `payment` (
-                           `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '支付ID',
+                           `id` bigint(20) NOT NULL COMMENT '支付ID',
                            `order_id` bigint(20) NOT NULL COMMENT '订单ID',
                            `customer_id` bigint(20) NOT NULL COMMENT '用户ID',
                            `payment_amount` decimal(10,2) NOT NULL COMMENT '支付金额',
@@ -157,7 +157,7 @@ CREATE TABLE `payment` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='支付表';
 
 CREATE TABLE `refund` (
-                          `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '退款ID',
+                          `id` bigint(20) NOT NULL COMMENT '退款ID',
                           `payment_id` bigint(20) NOT NULL COMMENT '支付ID',
                           `order_id` bigint(20) NOT NULL COMMENT '订单ID',
                           `customer_id` bigint(20) NOT NULL COMMENT '用户ID',

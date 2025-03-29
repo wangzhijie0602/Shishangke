@@ -1,40 +1,31 @@
-package club._8b1t.model.entity;
+package club._8b1t.model.vo;
 
 import club._8b1t.model.enums.payment.PaymentMethod;
 import club._8b1t.model.enums.payment.PaymentStatus;
-import club._8b1t.model.vo.PaymentVO;
-import io.github.linpeilie.annotations.AutoMapper;
-
-import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableId;
-import com.baomidou.mybatisplus.annotation.TableName;
-import java.math.BigDecimal;
-import java.util.Date;
 import lombok.Data;
 
+import java.math.BigDecimal;
+import java.util.Date;
+
 /**
- * 支付表
- * @TableName payment
+ * 支付信息VO
  */
-@TableName(value ="payment")
 @Data
-@AutoMapper(target = PaymentVO.class)
-public class Payment {
+public class PaymentVO {
     /**
      * 支付ID
      */
-    @TableId(type = IdType.ASSIGN_ID)
-    private Long id;
+    private String id;
 
     /**
      * 订单ID
      */
-    private Long orderId;
+    private String orderId;
 
     /**
      * 用户ID
      */
-    private Long customerId;
+    private String customerId;
 
     /**
      * 支付金额
@@ -65,4 +56,4 @@ public class Payment {
      * 更新时间
      */
     private Date updatedAt;
-}
+} 

@@ -10,7 +10,6 @@
             <result property="customerId" column="customer_id" />
             <result property="paymentAmount" column="payment_amount" />
             <result property="paymentMethod" column="payment_method" />
-            <result property="transactionId" column="transaction_id" />
             <result property="status" column="status" />
             <result property="paymentTime" column="payment_time" />
             <result property="createdAt" column="created_at" />
@@ -18,7 +17,7 @@
     </resultMap>
 
     <sql id="Base_Column_List">
-        id,order_id,customer_id,payment_amount,payment_method,transaction_id,
+        id,order_id,customer_id,payment_amount,payment_method,
         status,payment_time,created_at,updated_at
     </sql>
 </mapper>

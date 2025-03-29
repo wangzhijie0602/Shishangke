@@ -1,4 +1,4 @@
-package club._8b1t.model.enums.order;
+package club._8b1t.model.enums.payment;
 
 import com.baomidou.mybatisplus.annotation.EnumValue;
 import lombok.Getter;

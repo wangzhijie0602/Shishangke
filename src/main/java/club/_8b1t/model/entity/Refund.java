@@ -1,6 +1,6 @@
 package club._8b1t.model.entity;
 
-import club._8b1t.model.enums.order.RefundStatus;
+import club._8b1t.model.enums.payment.RefundStatus;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
@@ -18,7 +18,7 @@ public class Refund {
     /**
      * 退款ID
      */
-    @TableId(type = IdType.AUTO)
+    @TableId(type = IdType.ASSIGN_ID)
     private Long id;
 
     /**
