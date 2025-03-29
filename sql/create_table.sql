@@ -140,9 +140,7 @@ CREATE TABLE `order_item` (
 
 CREATE TABLE `payment` (
                            `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '支付ID',
-                           `payment_no` varchar(64) NOT NULL COMMENT '支付单号',
                            `order_id` bigint(20) NOT NULL COMMENT '订单ID',
-                           `order_no` varchar(64) NOT NULL COMMENT '订单编号',
                            `customer_id` bigint(20) NOT NULL COMMENT '用户ID',
                            `payment_amount` decimal(10,2) NOT NULL COMMENT '支付金额',
                            `payment_method` ENUM('WECHAT', 'ALIPAY', 'CREDIT_CARD', 'CASH') NOT NULL COMMENT '支付方式',
@@ -152,9 +150,7 @@ CREATE TABLE `payment` (
                            `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
                            `updated_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
                            PRIMARY KEY (`id`),
-                           UNIQUE KEY `idx_payment_no` (`payment_no`),
                            KEY `idx_order_id` (`order_id`),
-                           KEY `idx_order_no` (`order_no`),
                            KEY `idx_customer_id` (`customer_id`),
                            KEY `idx_status` (`status`),
                            KEY `idx_payment_time` (`payment_time`)
@@ -162,19 +158,16 @@ CREATE TABLE `payment` (
 
 CREATE TABLE `refund` (
                           `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '退款ID',
-                          `refund_no` varchar(64) NOT NULL COMMENT '退款单号',
                           `payment_id` bigint(20) NOT NULL COMMENT '支付ID',
                           `order_id` bigint(20) NOT NULL COMMENT '订单ID',
                           `customer_id` bigint(20) NOT NULL COMMENT '用户ID',
                           `refund_amount` decimal(10,2) NOT NULL COMMENT '退款金额',
                           `reason` varchar(255) DEFAULT NULL COMMENT '退款原因',
                           `status` ENUM('PENDING', 'SUCCESS', 'FAILED') NOT NULL COMMENT '退款状态',
-                          `transaction_id` varchar(100) DEFAULT NULL COMMENT '第三方退款交易号',
                           `refund_time` datetime DEFAULT NULL COMMENT '退款时间',
                           `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
                           `updated_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
                           PRIMARY KEY (`id`),
-                          UNIQUE KEY `idx_refund_no` (`refund_no`),
                           KEY `idx_payment_id` (`payment_id`),
                           KEY `idx_order_id` (`order_id`),
                           KEY `idx_customer_id` (`customer_id`),
