@@ -103,7 +103,7 @@ CREATE TABLE `order` (
                         'merchant_name' varchar(100) comment '店铺名称',
                          `total_amount` decimal(10,2) NOT NULL COMMENT '订单总金额',
                          `actual_amount` decimal(10,2) NOT NULL COMMENT '实际支付金额',
-                         `status` ENUM('PENDING', 'PAID', 'PREPARING', 'DELIVERING', 'COMPLETED', 'CANCELLED') NOT NULL DEFAULT 'PENDING' COMMENT '订单状态',
+                         `status` ENUM('PENDING', 'PAID', 'PREPARING', 'DELIVERING', 'COMPLETED', 'CANCELLED', 'REFUNDED', 'REFUNDING') NOT NULL DEFAULT 'PENDING' COMMENT '订单状态',
                          `address_id` bigint(20) COMMENT '收货地址ID',
                          `receiver_name` varchar(50) COMMENT '收货人姓名',
                          `receiver_phone` varchar(20) COMMENT '收货人电话',

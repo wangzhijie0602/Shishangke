@@ -32,7 +32,17 @@ public enum OrderStatus {
      * 已完成 - 订单已送达并完成
      */
     COMPLETED("COMPLETED", "已完成"),
-    
+
+    /**
+     * 已退款 - 订单已退款
+     */
+    REFUNDED("REFUNDED", "已退款"),
+
+    /**
+     * 退款中 - 订单正在退款
+     */
+    REFUNDING("REFUNDING", "退款中"),
+
     /**
      * 已取消 - 订单已被取消
      */
