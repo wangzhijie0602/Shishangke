@@ -1,11 +1,11 @@
 package club._8b1t.model.dto.order;
 
-import club._8b1t.model.entity.Order;
+import club._8b1t.model.entity.DeliveryOrder;
 import io.github.linpeilie.annotations.AutoMapper;
 import lombok.Data;
 
 @Data
-@AutoMapper(target = Order.class)
+@AutoMapper(target = DeliveryOrder.class)
 public class OrderAddressRequest {
 
     /**

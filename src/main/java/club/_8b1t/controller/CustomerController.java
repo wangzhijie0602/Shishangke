@@ -22,6 +22,7 @@ import club._8b1t.service.MenuService;
 import club._8b1t.service.MerchantService;
 import club._8b1t.util.ResultUtil;
 import cn.dev33.satoken.stp.StpUtil;
+import cn.hutool.core.util.RandomUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.linpeilie.Converter;
@@ -29,10 +30,15 @@ import io.swagger.v3.oas.annotations.Operation;
 import jakarta.annotation.Resource;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
+import org.redisson.api.RLock;
+import org.redisson.api.RMap;
+import org.redisson.api.RMapCache;
+import org.redisson.api.RedissonClient;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 @RestController
 @RequestMapping("/api/v1/customer")
@@ -53,6 +59,9 @@ public class CustomerController {
 
     @Resource
     private CustomerAddressService customerAddressService;
+
+    @Resource
+    private RedissonClient redisson;
 
     /**
      * 注册顾客账号
@@ -265,14 +274,99 @@ public class CustomerController {
     public Result<Page<MerchantVO>> getMerchants(@RequestParam(defaultValue = "1") Integer pageNumber,
                                                  @RequestParam(defaultValue = "10") Integer pageSize) {
 
-        Page<Merchant> merchantPage = merchantService.page(new Page<>(pageNumber, pageSize), new LambdaQueryWrapper<>(Merchant.class).eq(Merchant::getStatus, StatusEnum.OPEN));
+        // 参数校验，防止异常参数导致缓存击穿
+        if (pageNumber <= 0) {
+            pageNumber = 1;
+        }
+        if (pageSize <= 0 || pageSize > 100) {
+            pageSize = 10;
+        }
 
-        Page<MerchantVO> merchantVOPage = new Page<>(merchantPage.getCurrent(), merchantPage.getSize(), merchantPage.getTotal());
+        // 构建缓存键
+        String cacheKey = "merchants:page_" + pageNumber + "_" + pageSize;
+
+        // 从Redisson获取RMapCache对象
+        RMapCache<String, Result<Page<MerchantVO>>> cache = redisson.getMapCache("merchants_cache");
+
+        // 使用Redisson的分布式锁防止缓存击穿
+        RLock lock = redisson.getLock("merchants_lock:" + cacheKey);
+
+        // 尝试从缓存获取结果
+        Result<Page<MerchantVO>> result = cache.get(cacheKey);
+
+        if (result != null) {
+            return result;
+        }
+
+        try {
+            // 使用尝试锁防止大量相同请求并发重建缓存(缓存击穿)
+            // 等待2秒，持有锁10秒
+            boolean lockAcquired = lock.tryLock(2, 10, TimeUnit.SECONDS);
+            if (lockAcquired) {
+                try {
+                    // 双重检查，防止有其他线程已经重建了缓存
+                    result = cache.get(cacheKey);
+                    if (result != null) {
+                        return result;
+                    }
+
+                    // 查询商户数据
+                    Page<Merchant> merchantPage = merchantService.page(new Page<>(pageNumber, pageSize),
+                            new LambdaQueryWrapper<>(Merchant.class).eq(Merchant::getStatus, StatusEnum.OPEN));
+
+                    Page<MerchantVO> merchantVOPage = new Page<>(merchantPage.getCurrent(),
+                            merchantPage.getSize(), merchantPage.getTotal());
+
+                    merchantVOPage.setRecords(converter.convert(merchantPage.getRecords(), MerchantVO.class));
+
+                    result = ResultUtil.success(merchantVOPage);
+
+                    // 防止缓存穿透：即使是空结果也缓存，但时间较短
+                    if (merchantVOPage.getRecords() == null || merchantVOPage.getRecords().isEmpty()) {
+                        // 对于空结果，缓存时间较短，5分钟
+                        cache.put(cacheKey, result, 5, TimeUnit.MINUTES);
+                    } else {
+                        // 正常结果使用随机过期时间，防止缓存雪崩
+                        // 基础时间30分钟，随机增加0-10分钟的随机偏移
+                        int randomExpiry = 30 + RandomUtil.randomInt(10);
+                        cache.put(cacheKey, result, randomExpiry, TimeUnit.MINUTES);
+                    }
+                } finally {
+                    lock.unlock();
+                }
+            } else {
+                // 如果没有获取到锁，说明其他线程正在重建缓存，短暂等待后再查询
+                Thread.sleep(200);
+                // 递归调用，尝试再次获取
+                return getMerchants(pageNumber, pageSize);
+            }
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            log.error("获取商户列表缓存时发生中断异常", e);
+            // 出现异常时，降级直接查询数据库
+            return getDataFromDatabase(pageNumber, pageSize);
+        } catch (Exception e) {
+            log.error("获取商户列表缓存时发生异常", e);
+            // 其他异常时，降级直接查询数据库
+            return getDataFromDatabase(pageNumber, pageSize);
+        }
+
+        return result;
+    }
+
+    /**
+     * 从数据库直接获取数据的备用方法(降级方法)
+     * */
+    private Result<Page<MerchantVO>> getDataFromDatabase(Integer pageNumber, Integer pageSize) {
+        Page<Merchant> merchantPage = merchantService.page(new Page<>(pageNumber, pageSize),
+                new LambdaQueryWrapper<>(Merchant.class).eq(Merchant::getStatus, StatusEnum.OPEN));
+
+        Page<MerchantVO> merchantVOPage = new Page<>(merchantPage.getCurrent(),
+                merchantPage.getSize(), merchantPage.getTotal());
 
         merchantVOPage.setRecords(converter.convert(merchantPage.getRecords(), MerchantVO.class));
 
         return ResultUtil.success(merchantVOPage);
-
     }
 
     @GetMapping("/merchant/{merchantId}")

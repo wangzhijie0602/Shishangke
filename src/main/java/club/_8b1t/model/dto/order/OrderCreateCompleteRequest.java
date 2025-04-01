@@ -5,9 +5,9 @@ import lombok.Data;
 import java.util.List;
 
 @Data
-public class OrderCreateCompleteRequest {
+public class OrderCreateCompleteRequest<T> {
 
-    private OrderCreateRequest orderRequest;
+    private T orderRequest;
     private List<OrderItemCreateRequest> orderItemRequests;
     
 }

@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="club._8b1t.mapper.DineInOrderMapper">
+
+    <resultMap id="BaseResultMap" type="club._8b1t.model.entity.DineInOrder">
+            <id property="orderId" column="order_id" />
+            <result property="tableNumber" column="table_number" />
+            <result property="seatCount" column="seat_count" />
+            <result property="checkInTime" column="check_in_time" />
+            <result property="checkOutTime" column="check_out_time" />
+            <result property="waiterId" column="waiter_id" />
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        order_id,table_number,seat_count,check_in_time,check_out_time,waiter_id
+    </sql>
+</mapper>

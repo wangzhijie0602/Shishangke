@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="club._8b1t.mapper.DeliveryOrderMapper">
+
+    <resultMap id="BaseResultMap" type="club._8b1t.model.entity.DeliveryOrder">
+            <id property="orderId" column="order_id" />
+            <result property="receiverName" column="receiver_name" />
+            <result property="receiverPhone" column="receiver_phone" />
+            <result property="receiverAddress" column="receiver_address" />
+            <result property="deliveryFee" column="delivery_fee" />
+            <result property="expectedDeliveryTime" column="expected_delivery_time" />
+            <result property="actualDeliveryTime" column="actual_delivery_time" />
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        order_id,receiver_name,receiver_phone,receiver_address,delivery_fee,expected_delivery_time,
+        actual_delivery_time
+    </sql>
+</mapper>

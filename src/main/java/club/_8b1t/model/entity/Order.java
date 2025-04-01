@@ -1,6 +1,9 @@
 package club._8b1t.model.entity;
 
 import club._8b1t.model.enums.order.OrderStatus;
+import club._8b1t.model.enums.order.OrderType;
+import club._8b1t.model.vo.DeliveryOrderVO;
+import club._8b1t.model.vo.DineInOrderVO;
 import club._8b1t.model.vo.OrderVO;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
@@ -10,21 +13,31 @@ import java.math.BigDecimal;
 import java.util.Date;
 
 import io.github.linpeilie.annotations.AutoMapper;
+import io.github.linpeilie.annotations.AutoMappers;
 import lombok.Data;
 
 /**
- * 订单表
+ * 
  * @TableName order
  */
 @TableName(value ="`order`")
 @Data
-@AutoMapper(target = OrderVO.class)
+@AutoMappers({
+        @AutoMapper(target = OrderVO.class),
+        @AutoMapper(target = DeliveryOrderVO.class),
+        @AutoMapper(target = DineInOrderVO.class)
+})
 public class Order {
     /**
      * 订单ID
      */
     @TableId(type = IdType.ASSIGN_ID)
     private Long id;
+
+    /**
+     * 订单类型
+     */
+    private OrderType orderType;
 
     /**
      * 用户ID
@@ -37,7 +50,7 @@ public class Order {
     private Long merchantId;
 
     /**
-     * 商家名称
+     * 店铺名称
      */
     private String merchantName;
 
@@ -57,39 +70,9 @@ public class Order {
     private OrderStatus status;
 
     /**
-     * 收货人姓名
-     */
-    private String receiverName;
-
-    /**
-     * 收货人电话
-     */
-    private String receiverPhone;
-
-    /**
-     * 收货地址
-     */
-    private String receiverAddress;
-
-    /**
-     * 配送费
-     */
-    private BigDecimal deliveryFee;
-
-    /**
      * 订单备注
      */
     private String remark;
-
-    /**
-     * 预计送达时间
-     */
-    private Date expectedDeliveryTime;
-
-    /**
-     * 实际送达时间
-     */
-    private Date actualDeliveryTime;
 
     /**
      * 创建时间
