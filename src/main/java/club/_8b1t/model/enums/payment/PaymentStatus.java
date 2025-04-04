@@ -26,7 +26,12 @@ public enum PaymentStatus {
     /**
      * 已退款 - 支付已被退款
      */
-    REFUNDED("REFUNDED", "已退款");
+    REFUNDED("REFUNDED", "已退款"),
+    
+    /**
+     * 已关闭 - 支付超时自动关闭
+     */
+    CLOSED("CLOSED", "已关闭");
 
     @EnumValue
     private final String code;

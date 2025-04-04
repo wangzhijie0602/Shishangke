@@ -70,6 +70,9 @@ public class PaymentController {
             payment.setStatus(PaymentStatus.PENDING);
             boolean success = paymentService.save(payment);
             ExceptionUtil.throwIfNot(success, OPERATION_FAILED);
+            
+            // 发送支付超时自动关闭的延迟消息
+            paymentService.sendPaymentTimeoutMessage(payment.getId());
         }
 
         // 转换为VO对象并返回

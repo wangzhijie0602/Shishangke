@@ -18,6 +18,15 @@ public class RabbitMQConfig {
     public static final String ORDER_PROCESS_EXCHANGE = "order.process.exchange";
     public static final String ORDER_PROCESS_ROUTING_KEY = "order.process.key";
     
+    // 支付相关MQ配置
+    public static final String PAYMENT_DELAY_QUEUE = "payment.delay.queue";
+    public static final String PAYMENT_DELAY_EXCHANGE = "payment.delay.exchange";
+    public static final String PAYMENT_DELAY_ROUTING_KEY = "payment.delay.key";
+    
+    public static final String PAYMENT_PROCESS_QUEUE = "payment.process.queue";
+    public static final String PAYMENT_PROCESS_EXCHANGE = "payment.process.exchange";
+    public static final String PAYMENT_PROCESS_ROUTING_KEY = "payment.process.key";
+    
     // 配置RabbitMQ监听器容器工厂，设置为手动确认模式
     @Bean
     public SimpleRabbitListenerContainerFactory rabbitListenerContainerFactory(ConnectionFactory connectionFactory) {
@@ -60,5 +69,39 @@ public class RabbitMQConfig {
     @Bean
     public Binding orderProcessBinding() {
         return BindingBuilder.bind(orderProcessQueue()).to(orderProcessExchange()).with(ORDER_PROCESS_ROUTING_KEY);
+    }
+    
+    // 支付延迟队列配置
+    @Bean
+    public Queue paymentDelayQueue() {
+        return QueueBuilder.durable(PAYMENT_DELAY_QUEUE)
+                .withArgument("x-dead-letter-exchange", PAYMENT_PROCESS_EXCHANGE)
+                .withArgument("x-dead-letter-routing-key", PAYMENT_PROCESS_ROUTING_KEY)
+                .build();
+    }
+    
+    @Bean
+    public Queue paymentProcessQueue() {
+        return QueueBuilder.durable(PAYMENT_PROCESS_QUEUE).build();
+    }
+    
+    @Bean
+    public DirectExchange paymentDelayExchange() {
+        return new DirectExchange(PAYMENT_DELAY_EXCHANGE);
+    }
+    
+    @Bean
+    public DirectExchange paymentProcessExchange() {
+        return new DirectExchange(PAYMENT_PROCESS_EXCHANGE);
+    }
+    
+    @Bean
+    public Binding paymentDelayBinding() {
+        return BindingBuilder.bind(paymentDelayQueue()).to(paymentDelayExchange()).with(PAYMENT_DELAY_ROUTING_KEY);
+    }
+    
+    @Bean
+    public Binding paymentProcessBinding() {
+        return BindingBuilder.bind(paymentProcessQueue()).to(paymentProcessExchange()).with(PAYMENT_PROCESS_ROUTING_KEY);
     }
 }
