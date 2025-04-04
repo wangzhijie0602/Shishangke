@@ -2,7 +2,11 @@ package club._8b1t.service.impl;
 
 import club._8b1t.config.RabbitMQConfig;
 import club._8b1t.model.entity.Order;
+import club._8b1t.model.entity.Payment;
 import club._8b1t.model.enums.order.OrderStatus;
+import club._8b1t.model.enums.payment.PaymentStatus;
+import club._8b1t.service.PaymentService;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import club._8b1t.service.OrderService;
@@ -16,6 +20,7 @@ import org.springframework.amqp.core.MessagePostProcessor;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.stereotype.Service;
+import java.util.Date;
 
 import java.io.IOException;
 
@@ -31,6 +36,9 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order>
 
     @Resource
     private RabbitTemplate rabbitTemplate;
+
+    @Resource
+    private PaymentService paymentService;
 
     @Override
     public void sendOrderCancelDelayMessage(String orderId, int delayTimeMinutes) {
@@ -61,6 +69,39 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order>
         long deliveryTag = message.getMessageProperties().getDeliveryTag();
 
         try {
+            // 查询关联的支付记录，检查是否有处理中的支付
+            Payment payment = paymentService.getOne(new LambdaQueryWrapper<Payment>()
+                    .eq(Payment::getOrderId, orderId)
+                    .eq(Payment::getStatus, PaymentStatus.PENDING));
+                    
+            // 如果存在处理中的支付，给予额外缓冲时间（再等待3分钟）
+            if (payment != null) {
+                Date paymentCreateTime = payment.getCreatedAt();
+                Date now = new Date();
+                long paymentAgeMillis = now.getTime() - paymentCreateTime.getTime();
+                
+                // 如果支付记录创建时间不超过7分钟（支付的10分钟超时减去3分钟缓冲），则不关闭订单
+                if (paymentAgeMillis <= 7 * 60 * 1000) {
+                    log.info("订单[{}]存在进行中的支付，暂不关闭", orderId);
+                    // 重新发送延迟消息，3分钟后再次检查
+                    sendOrderCancelDelayMessage(orderId, 3);
+                    channel.basicAck(deliveryTag, false);
+                    return;
+                }
+            }
+            
+            // 查询是否有已支付成功的记录
+            payment = paymentService.getOne(new LambdaQueryWrapper<Payment>()
+                    .eq(Payment::getOrderId, orderId)
+                    .eq(Payment::getStatus, PaymentStatus.SUCCESS));
+            
+            // 如果存在已支付成功的记录，不取消订单
+            if (payment != null) {
+                log.info("订单[{}]已有支付成功记录，不执行取消操作", orderId);
+                channel.basicAck(deliveryTag, false);
+                return;
+            }
+
             // 使用条件更新来取消订单，只取消状态为PENDING的订单
             LambdaUpdateWrapper<Order> updateWrapper = new LambdaUpdateWrapper<>();
             updateWrapper.eq(Order::getId, orderId)
