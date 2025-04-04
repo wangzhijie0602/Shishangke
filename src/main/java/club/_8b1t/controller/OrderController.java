@@ -65,9 +65,6 @@ public class OrderController {
     @Resource
     private PaymentService paymentService;
 
-    @Resource
-    private MQService mqService;
-
     /**
      * 查询订单列表
      *
@@ -240,7 +237,7 @@ public class OrderController {
         ExceptionUtil.throwIfNot(savedBatch, OPERATION_FAILED);
         
         // 发送订单延迟取消消息，20分钟后自动取消
-        mqService.sendOrderCancelDelayMessage(order.getId().toString(), 20);
+        orderService.sendOrderCancelDelayMessage(order.getId().toString(), 20);
 
         Order order1 = orderService.getById(order.getId());
         DeliveryOrder deliveryOrder1 = deliveryOrderService.getById(order.getId());
@@ -307,7 +304,7 @@ public class OrderController {
         ExceptionUtil.throwIfNot(savedBatch, OPERATION_FAILED);
         
         // 发送订单延迟取消消息，20分钟后自动取消
-        mqService.sendOrderCancelDelayMessage(order.getId().toString(), 20);
+        orderService.sendOrderCancelDelayMessage(order.getId().toString(), 20);
 
         Order order1 = orderService.getById(order.getId());
         DineInOrder dineInOrder1 = dineInOrderService.getById(order.getId());
