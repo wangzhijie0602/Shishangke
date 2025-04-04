@@ -49,6 +49,7 @@ public class PaymentController {
         // 获取订单信息
         Order order = orderService.getById(request.getOrderId());
         ExceptionUtil.throwIfNull(order, OPERATION_FAILED);
+        ExceptionUtil.throwIfNot(order.getStatus() == OrderStatus.PENDING, OPERATION_FAILED);
 
         // 获取当前登录用户ID
         Long customerId = StpUtil.getLoginIdAsLong();

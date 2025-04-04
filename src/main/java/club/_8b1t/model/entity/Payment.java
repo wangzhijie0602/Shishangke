@@ -3,11 +3,9 @@ package club._8b1t.model.entity;
 import club._8b1t.model.enums.payment.PaymentMethod;
 import club._8b1t.model.enums.payment.PaymentStatus;
 import club._8b1t.model.vo.PaymentVO;
+import com.baomidou.mybatisplus.annotation.*;
 import io.github.linpeilie.annotations.AutoMapper;
 
-import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableId;
-import com.baomidou.mybatisplus.annotation.TableName;
 import java.math.BigDecimal;
 import java.util.Date;
 import lombok.Data;
@@ -59,10 +57,12 @@ public class Payment {
     /**
      * 创建时间
      */
+    @TableField(fill = FieldFill.INSERT)
     private Date createdAt;
 
     /**
      * 更新时间
      */
+    @TableField(fill = FieldFill.INSERT_UPDATE)
     private Date updatedAt;
 }

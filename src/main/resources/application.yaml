@@ -29,6 +29,11 @@ spring:
           max-idle: 10
           # 连接池中的最小空闲连接
           min-idle: 0
+  rabbitmq:
+    host: fnos
+    port: 5672
+    username: admin
+    password: kX7nL3pQ9zF2mD6E
 
   datasource:
     url: jdbc:mysql://fnos:3306/Shishangke

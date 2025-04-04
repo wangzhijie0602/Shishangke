@@ -65,6 +65,9 @@ public class OrderController {
     @Resource
     private PaymentService paymentService;
 
+    @Resource
+    private MQService mqService;
+
     /**
      * 查询订单列表
      *
@@ -169,6 +172,7 @@ public class OrderController {
     public Result<OrderAndItemVO> createDeliveryOrder(@RequestBody OrderCreateCompleteRequest<OrderDeliveryCreateRequest> request) {
         // 转换订单基本信息
         Order order = converter.convert(request.getOrderRequest(), Order.class);
+        order.setOrderType(OrderType.DELIVERY);
 
         // 获取商家信息并设置商家名称
         Merchant merchant = merchantService.getById(order.getMerchantId());
@@ -234,6 +238,9 @@ public class OrderController {
         // 批量保存订单项
         boolean savedBatch = orderItemService.saveBatch(orderItemList);
         ExceptionUtil.throwIfNot(savedBatch, OPERATION_FAILED);
+        
+        // 发送订单延迟取消消息，20分钟后自动取消
+        mqService.sendOrderCancelDelayMessage(order.getId().toString(), 20);
 
         Order order1 = orderService.getById(order.getId());
         DeliveryOrder deliveryOrder1 = deliveryOrderService.getById(order.getId());
@@ -254,6 +261,7 @@ public class OrderController {
     @Operation(operationId = "order_create_dinein_order")
     public Result<OrderAndItemVO> createDineinOrder(@RequestBody OrderCreateCompleteRequest<OrderDineinCreateRequest> request) {
         Order order = converter.convert(request.getOrderRequest(), Order.class);
+        order.setOrderType(OrderType.DINE_IN);
 
         Merchant merchant = merchantService.getById(order.getMerchantId());
         ExceptionUtil.throwIfNull(merchant, OPERATION_FAILED);
@@ -297,6 +305,9 @@ public class OrderController {
 
         boolean savedBatch = orderItemService.saveBatch(orderItemList);
         ExceptionUtil.throwIfNot(savedBatch, OPERATION_FAILED);
+        
+        // 发送订单延迟取消消息，20分钟后自动取消
+        mqService.sendOrderCancelDelayMessage(order.getId().toString(), 20);
 
         Order order1 = orderService.getById(order.getId());
         DineInOrder dineInOrder1 = dineInOrderService.getById(order.getId());
